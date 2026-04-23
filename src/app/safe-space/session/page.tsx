@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AICompanionChat } from '@/components/safe-space/AICompanionChat';
+import { CounselorChat } from '@/components/safe-space/CounselorChat';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -31,20 +32,16 @@ function SessionContent() {
       <div className="flex-1 bg-white overflow-hidden">
         {mode === 'ai_companion' ? (
           <AICompanionChat />
+        ) : mode === 'counselor' ? (
+          <CounselorChat />
         ) : (
           <div className="flex flex-col items-center justify-center h-full gap-4 p-6 text-center">
             <div className="w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center text-2xl">
-              {mode === 'peer_listener' ? '👥' : '🩺'}
+              👥
             </div>
             <div>
-              <h2 className="text-sm font-medium text-gray-900">
-                {mode === 'peer_listener' ? 'Finding a peer listener...' : 'Booking counselor session'}
-              </h2>
-              <p className="text-xs text-gray-500 mt-1">
-                {mode === 'peer_listener'
-                  ? 'A trained peer volunteer will be with you shortly.'
-                  : 'Configure Stream API keys in .env.local to enable live chat.'}
-              </p>
+              <h2 className="text-sm font-medium text-gray-900">Finding a peer listener...</h2>
+              <p className="text-xs text-gray-500 mt-1">A trained peer volunteer will be with you shortly.</p>
             </div>
             <p className="text-xs text-gray-400 mt-4">
               While you wait — Befrienders: <span className="text-rose-600 font-medium">03-7627 2929</span> (24/7, free)

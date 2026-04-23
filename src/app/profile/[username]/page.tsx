@@ -6,24 +6,24 @@ import { PostCard } from '@/components/feed/PostCard';
 import { MapPin, School } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
-export default async function ProfilePage({ params }: { params: { username: string } }) {
+export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
+  const { username } = await params;
   const supabase = await createClient();
 
   const { data: profile } = await supabase
     .from('profiles')
     .select('*')
-    .eq('username', params.username)
+    .eq('username', username)
     .single();
 
   if (!profile) {
-    // Show demo profile for unauthenticated users
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="rounded-xl border border-gray-100 bg-white p-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-2xl mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full bg-sage-100 flex items-center justify-center text-2xl mx-auto mb-4">
             👤
           </div>
-          <h1 className="text-lg font-medium text-gray-900">@{params.username}</h1>
+          <h1 className="text-lg font-medium text-gray-900">@{username}</h1>
           <p className="text-sm text-gray-500 mt-1">Profile not found or not yet created</p>
         </div>
       </div>
@@ -43,7 +43,7 @@ export default async function ProfilePage({ params }: { params: { username: stri
       {/* Profile header */}
       <div className="rounded-xl border border-gray-100 bg-white p-6">
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-xl font-medium text-purple-700">
+          <div className="w-16 h-16 rounded-full bg-sage-100 flex items-center justify-center text-xl font-medium text-sage-700">
             {profile.display_name?.[0] || profile.username[0]}
           </div>
           <div className="flex-1">
@@ -60,7 +60,7 @@ export default async function ProfilePage({ params }: { params: { username: stri
             </div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-medium text-purple-600">Lv.{profile.level}</div>
+            <div className="text-lg font-medium text-sage-600">Lv.{profile.level}</div>
             <div className="text-xs text-gray-400">{profile.points} XP</div>
           </div>
         </div>

@@ -1,0 +1,742 @@
+<!DOCTYPE html><html lang="en"><head>
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAVEN — Grow Together</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&amp;display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ─────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #080D09;
+  --bg-card:      rgba(255,255,255,0.035);
+  --bg-card-h:    rgba(255,255,255,0.065);
+  --border:       rgba(255,255,255,0.08);
+  --border-h:     rgba(255,255,255,0.16);
+
+  --sage:         #6BBF7A;
+  --sage-dim:     rgba(107,191,122,0.15);
+  --sage-glow:    rgba(107,191,122,0.08);
+
+  --cream:        #EDEAE2;
+  --cream-60:     rgba(237,234,226,0.60);
+  --cream-35:     rgba(237,234,226,0.35);
+  --cream-15:     rgba(237,234,226,0.15);
+
+  /* Pillar neon accents */
+  --grow:         #9D8FFF;
+  --grow-dim:     rgba(157,143,255,0.12);
+  --connect:      #4ECFAD;
+  --connect-dim:  rgba(78,207,173,0.12);
+  --circle:       #F0B04A;
+  --circle-dim:   rgba(240,176,74,0.12);
+  --safe:         #FF8A80;
+  --safe-dim:     rgba(255,138,128,0.12);
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+
+  --max:          1200px;
+  --nav-h:        72px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ── Noise texture overlay ─────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.025;
+}
+
+/* ── Utility ────────────────────────────────────── */
+.container { max-width: var(--max); margin: 0 auto; padding: 0 40px; position: relative; }
+.tag { display: inline-flex; align-items: center; gap: 7px; font-family: var(--font-display); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--cream-35); }
+.tag::before { content: '✦'; color: var(--sage); font-size: 9px; }
+.divider { width: 100%; height: 1px; background: var(--border); }
+
+/* ── Nav ────────────────────────────────────────── */
+nav {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 100;
+  background: rgba(8,13,9,0.75);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 10px 10px 10px 20px;
+  display: flex; align-items: center; gap: 6px;
+  width: min(760px, calc(100vw - 40px));
+  transition: background .3s;
+}
+.nav-logo { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--cream); text-decoration: none; letter-spacing: -0.01em; margin-right: 4px; }
+.nav-links { display: flex; gap: 2px; flex: 1; }
+.nav-links a { font-size: 13px; font-weight: 400; color: var(--cream-60); text-decoration: none; padding: 6px 12px; border-radius: 9999px; transition: color .2s, background .2s; }
+.nav-links a:hover { color: var(--cream); background: var(--cream-15); }
+.nav-cta { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.btn-ghost { font-size: 13px; font-weight: 500; color: var(--cream-60); background: none; border: none; cursor: pointer; padding: 8px 14px; border-radius: 9999px; font-family: var(--font-body); transition: color .2s; }
+.btn-ghost:hover { color: var(--cream); }
+.btn-pill { font-size: 13px; font-weight: 500; color: var(--bg); background: var(--sage); border: none; cursor: pointer; padding: 9px 18px; border-radius: 9999px; font-family: var(--font-body); transition: background .2s, transform .15s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.btn-pill:hover { background: #7DD48A; transform: translateY(-1px); }
+.btn-outline { font-size: 14px; font-weight: 500; color: var(--cream); background: transparent; border: 1px solid var(--border-h); cursor: pointer; padding: 12px 24px; border-radius: 9999px; font-family: var(--font-body); transition: border-color .2s, background .2s, transform .15s; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.btn-outline:hover { border-color: var(--cream-60); background: var(--cream-15); transform: translateY(-1px); }
+
+/* ── Hero ─────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: calc(var(--nav-h) + 60px) 0 100px;
+  position: relative; overflow: hidden;
+}
+.hero-bg-orb {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  filter: blur(120px);
+}
+.orb-1 { width: 600px; height: 600px; background: rgba(107,191,122,0.07); top: -100px; right: -200px; }
+.orb-2 { width: 400px; height: 400px; background: rgba(157,143,255,0.06); bottom: 0; left: -100px; }
+
+/* Orbit rings */
+.orbit-ring {
+  position: absolute; border-radius: 50%; border: 1px solid var(--border);
+  pointer-events: none;
+}
+
+.hero-eyebrow { margin-bottom: 28px; }
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(52px, 7.5vw, 104px);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--cream);
+  max-width: 10ch;
+  margin-bottom: 28px;
+}
+.hero h1 em { font-style: normal; color: var(--sage); }
+
+.hero-sub {
+  font-size: clamp(15px, 1.4vw, 18px);
+  color: var(--cream-60);
+  max-width: 480px;
+  line-height: 1.7;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+
+.hero-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.btn-hero { font-size: 15px; font-weight: 500; color: var(--bg); background: var(--sage); border: none; cursor: pointer; padding: 14px 28px; border-radius: 9999px; font-family: var(--font-body); transition: background .2s, transform .15s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.btn-hero:hover { background: #7DD48A; transform: translateY(-1px); }
+
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--cream-35); margin-top: 60px; }
+.hero-badge span { color: var(--sage); }
+
+/* Stat strip */
+.stat-strip { display: flex; gap: 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-top: 80px; }
+.stat-item { flex: 1; padding: 28px 0; text-align: center; border-right: 1px solid var(--border); }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-family: var(--font-display); font-size: 36px; font-weight: 700; color: var(--cream); letter-spacing: -0.03em; display: block; }
+.stat-num em { font-style: normal; color: var(--sage); }
+.stat-label { font-size: 12px; color: var(--cream-35); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* ── Section base ─────────────────────────────── */
+section { padding: 120px 0; position: relative; }
+.section-header { margin-bottom: 64px; }
+.section-header .tag { margin-bottom: 20px; }
+.section-header h2 { font-family: var(--font-display); font-size: clamp(32px, 4vw, 52px); font-weight: 600; letter-spacing: -0.025em; color: var(--cream); line-height: 1.1; }
+.section-header p { font-size: 16px; color: var(--cream-60); margin-top: 16px; max-width: 480px; font-weight: 300; line-height: 1.7; }
+
+/* ── Problem section ──────────────────────────── */
+.problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.problem-card {
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 36px;
+  background: var(--bg-card);
+  transition: border-color .25s, background .25s;
+  position: relative; overflow: hidden;
+}
+.problem-card:hover { border-color: var(--border-h); background: var(--bg-card-h); }
+.problem-num {
+  font-family: var(--font-display); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--cream-35); margin-bottom: 20px;
+}
+.problem-card h3 { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--cream); margin-bottom: 12px; letter-spacing: -0.01em; }
+.problem-card p { font-size: 14px; color: var(--cream-60); line-height: 1.7; }
+.problem-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+
+/* ── Pillar cards ─────────────────────────────── */
+.pillars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.pillar-card {
+  border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px 28px;
+  background: var(--bg-card);
+  position: relative; overflow: hidden;
+  transition: transform .25s, border-color .25s, background .25s;
+  cursor: default;
+}
+.pillar-card:hover { transform: translateY(-4px); border-color: var(--border-h); background: var(--bg-card-h); }
+.pillar-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  border-radius: 20px 20px 0 0;
+}
+.pillar-card.grow::before   { background: var(--grow); }
+.pillar-card.connect::before{ background: var(--connect); }
+.pillar-card.circle::before { background: var(--circle); }
+.pillar-card.safe::before   { background: var(--safe); }
+
+.pillar-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.pillar-card.grow   .pillar-icon { background: var(--grow-dim); }
+.pillar-card.connect .pillar-icon { background: var(--connect-dim); }
+.pillar-card.circle  .pillar-icon { background: var(--circle-dim); }
+.pillar-card.safe    .pillar-icon { background: var(--safe-dim); }
+
+.pillar-card h3 { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--cream); margin-bottom: 10px; letter-spacing: -0.01em; }
+.pillar-card p { font-size: 13px; color: var(--cream-60); line-height: 1.7; }
+
+.pillar-label {
+  display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 9999px; margin-bottom: 16px;
+}
+.pillar-card.grow   .pillar-label { background: var(--grow-dim); color: var(--grow); }
+.pillar-card.connect .pillar-label { background: var(--connect-dim); color: var(--connect); }
+.pillar-card.circle  .pillar-label { background: var(--circle-dim); color: var(--circle); }
+.pillar-card.safe    .pillar-label { background: var(--safe-dim); color: var(--safe); }
+
+/* ── How it works ─────────────────────────────── */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; position: relative; }
+.steps::before {
+  content: '';
+  position: absolute; top: 28px; left: calc(100%/6); right: calc(100%/6);
+  height: 1px; background: var(--border);
+}
+.step { text-align: center; padding: 0 32px; }
+.step-num {
+  width: 56px; height: 56px; border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  font-family: var(--font-display); font-size: 13px; font-weight: 600;
+  color: var(--cream-35); position: relative; z-index: 1;
+}
+.step h3 { font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--cream); margin-bottom: 10px; }
+.step p { font-size: 14px; color: var(--cream-60); line-height: 1.7; }
+
+/* ── Safe Space callout ───────────────────────── */
+.safespace-section {
+  background: linear-gradient(135deg, rgba(255,138,128,0.06) 0%, rgba(8,13,9,0) 60%);
+  border-top: 1px solid rgba(255,138,128,0.15);
+  border-bottom: 1px solid rgba(255,138,128,0.15);
+}
+.safespace-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.safespace-chat { display: flex; flex-direction: column; gap: 12px; }
+.chat-bubble {
+  padding: 14px 18px; border-radius: 18px; font-size: 14px; line-height: 1.6; max-width: 320px;
+}
+.chat-bubble.ai { background: rgba(255,255,255,0.07); color: var(--cream); border: 1px solid var(--border); align-self: flex-start; border-radius: 4px 18px 18px 18px; }
+.chat-bubble.user { background: rgba(255,138,128,0.18); color: var(--cream); align-self: flex-end; border-radius: 18px 4px 18px 18px; }
+.chat-sender { font-size: 11px; color: var(--cream-35); margin-bottom: 4px; }
+.anon-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--safe); background: var(--safe-dim); padding: 5px 12px; border-radius: 9999px; margin-top: 8px; }
+
+/* ── CTA banner ───────────────────────────────── */
+.cta-section {
+  text-align: center;
+  background: radial-gradient(ellipse 60% 60% at 50% 0%, rgba(107,191,122,0.1) 0%, transparent 70%);
+}
+.cta-section h2 { font-family: var(--font-display); font-size: clamp(36px, 5vw, 64px); font-weight: 700; letter-spacing: -0.03em; color: var(--cream); max-width: 700px; margin: 0 auto 24px; line-height: 1.1; }
+.cta-section h2 em { font-style: normal; color: var(--sage); }
+.cta-section p { font-size: 16px; color: var(--cream-60); margin-bottom: 40px; font-weight: 300; }
+.cta-actions { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+
+/* ── Footer ────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 0;
+}
+.footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.footer-logo { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--cream); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 13px; color: var(--cream-35); text-decoration: none; transition: color .2s; }
+.footer-links a:hover { color: var(--cream); }
+.footer-copy { font-size: 12px; color: var(--cream-35); }
+
+/* ── Photo strip ────────────────────────────────── */
+.photo-strip-wrap {
+  width: 100%; overflow: hidden;
+  padding: 0 0 100px;
+  mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+}
+.photo-strip {
+  display: flex; gap: 14px;
+  animation: slide-photos 28s linear infinite;
+  width: max-content;
+}
+.photo-item {
+  width: 280px; height: 200px; border-radius: 16px; overflow: hidden; flex-shrink: 0;
+  border: 1px solid var(--border);
+  position: relative;
+}
+.photo-item::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(8,13,9,0.55) 100%);
+  border-radius: 16px;
+}
+.photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.85) brightness(0.9); transition: filter .4s; }
+.photo-item:hover img { filter: saturate(1) brightness(1); }
+@keyframes slide-photos {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.photo-strip:hover { animation-play-state: paused; }
+
+/* ── Wellbeing image block ───────────────────────── */
+.wellbeing-img {
+  width: 100%; aspect-ratio: 16/9; border-radius: 20px; overflow: hidden;
+  border: 1px solid var(--border); position: relative; margin-top: 60px;
+}
+.wellbeing-img img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.8) brightness(0.75); }
+.wellbeing-img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(8,13,9,0.7) 0%, rgba(255,138,128,0.15) 100%);
+  display: flex; align-items: flex-end; padding: 32px;
+}
+.wellbeing-img-caption {
+  font-family: var(--font-display); font-size: 22px; font-weight: 600;
+  color: var(--cream); max-width: 360px; line-height: 1.3; letter-spacing: -0.01em;
+}
+.wellbeing-img-caption em { font-style: normal; color: var(--safe); }
+
+/* ── Hero image grid (right side) ──────────────── */
+.hero-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.hero-image-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hero-img-cell { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+.hero-img-cell::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(8,13,9,0.5) 100%); }
+.hero-img-cell img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.85) brightness(0.85); display: block; }
+.hero-img-cell:nth-child(1) { height: 200px; }
+.hero-img-cell:nth-child(2) { height: 200px; margin-top: 24px; }
+.hero-img-cell:nth-child(3) { height: 160px; }
+.hero-img-cell:nth-child(4) { height: 160px; margin-top: -24px; }
+
+@media (max-width: 900px) {
+  .hero-layout { grid-template-columns: 1fr; }
+  .hero-image-grid { display: none; }
+}
+
+/* ── Scroll reveal ─────────────────────────────── */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ── Responsive ────────────────────────────────── */
+@media (max-width: 900px) {
+  .container { padding: 0 20px; }
+  .pillars-grid { grid-template-columns: 1fr 1fr; }
+  .problem-grid { grid-template-columns: 1fr; }
+  .safespace-inner { grid-template-columns: 1fr; gap: 40px; }
+  .steps { grid-template-columns: 1fr; gap: 40px; }
+  .steps::before { display: none; }
+  .nav-links { display: none; }
+  .stat-strip { flex-wrap: wrap; }
+  .stat-item { flex-basis: 50%; border-bottom: 1px solid var(--border); }
+}
+@media (max-width: 600px) {
+  .pillars-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 48px; }
+}
+</style>
+<link id="gfont-Fira-Sans" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&amp;display=swap"></head>
+<body data-cc-id="cc-1" style="cursor: crosshair; font-family: &quot;Fira Sans&quot;;">
+
+<!-- ── NAV ────────────────────────────────────── -->
+<nav style="background: rgba(8, 13, 9, 0.75);">
+  <a href="#" class="nav-logo">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6BBF7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 20h10"></path><path d="M10 20c5.5-2.5.8-6.4 3-10"></path>
+      <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"></path>
+      <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"></path>
+    </svg>
+    HAVEN
+  </a>
+  <div class="nav-links">
+    <a href="#pillars">Platform</a>
+    <a href="#how">How it works</a>
+    <a href="#safe-space">Safe Space</a>
+  </div>
+  <div class="nav-cta">
+    <button class="btn-ghost">Sign in</button>
+    <a href="#" class="btn-pill">Get started</a>
+  </div>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────── -->
+<section class="hero">
+  <!-- Background orbs -->
+  <div class="hero-bg-orb orb-1"></div>
+  <div class="hero-bg-orb orb-2"></div>
+  <!-- Orbit rings -->
+  <div class="orbit-ring" style="width:560px;height:560px;top:-80px;right:-160px;opacity:0.4;"></div>
+  <div class="orbit-ring" style="width:320px;height:320px;top:80px;right:0;opacity:0.25;"></div>
+
+  <div class="container">
+    <div class="hero-layout">
+      <!-- Left: copy -->
+      <div>
+        <div class="hero-eyebrow">
+          <span class="tag">Malaysian Youth Platform ✦ Powered by AI</span>
+        </div>
+        <h1>Grow <em>Together.</em></h1>
+        <p class="hero-sub">
+          The platform where Malaysian youth aged 15–30 develop skills, find opportunities, build circles, and support each other — all in one place.
+        </p>
+        <div class="hero-actions">
+          <a href="#" class="btn-hero">
+            Start for free
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="#pillars" class="btn-outline">See the platform</a>
+        </div>
+        <div class="hero-badge">
+          <span>✦</span> Built at UPM Hackathon 2025 &nbsp;·&nbsp; Privacy-first by design
+        </div>
+      </div>
+
+      <!-- Right: staggered image grid -->
+      <div class="hero-image-grid">
+        <div class="hero-img-cell">
+          <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=420&q=80&fit=crop&crop=faces" alt="Students collaborating" loading="lazy">
+        </div>
+        <div class="hero-img-cell">
+          <img src="https://images.unsplash.com/photo-1529390079861-591de354faf5?w=420&q=80&fit=crop&crop=faces" alt="Youth learning" loading="lazy">
+        </div>
+        <div class="hero-img-cell">
+          <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=420&q=80&fit=crop" alt="Youth volunteering" loading="lazy">
+        </div>
+        <div class="hero-img-cell">
+          <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=420&q=80&fit=crop&crop=faces" alt="Peer community" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat strip -->
+    <div class="stat-strip reveal visible">
+      <div class="stat-item">
+        <span class="stat-num">4<em>✦</em></span>
+        <div class="stat-label">Core Pillars</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">24<em>/7</em></span>
+        <div class="stat-label">AI Companion</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">100<em>%</em></span>
+        <div class="stat-label">Anonymous in Safe Space</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">15<em>–30</em></span>
+        <div class="stat-label">Age group served</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOCIAL PROOF PHOTO STRIP ─────────────── -->
+<div class="photo-strip-wrap">
+  <div class="photo-strip">
+    <div class="photo-item">
+      <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=480&q=80&fit=crop" alt="Students collaborating" loading="lazy">
+    </div>
+    <div class="photo-item">
+      <img src="https://images.unsplash.com/photo-1529390079861-591de354faf5?w=480&q=80&fit=crop" alt="Young person studying" loading="lazy">
+    </div>
+    <div class="photo-item">
+      <img src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=480&q=80&fit=crop" alt="Youth group discussion" loading="lazy">
+    </div>
+    <div class="photo-item">
+      <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?w=480&q=80&fit=crop" alt="Student on laptop" loading="lazy">
+    </div>
+    <div class="photo-item">
+      <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=480&q=80&fit=crop" alt="Youth volunteering" loading="lazy">
+    </div>
+    <div class="photo-item">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=480&q=80&fit=crop" alt="Young professional" loading="lazy">
+    </div>
+  </div>
+</div>
+
+<!-- ── PROBLEM ──────────────────────────────── -->
+<section id="problem">
+  <div class="container">
+    <div class="section-header reveal visible">
+      <span class="tag">01 — The Problem</span>
+      <h2>Three walls most youth<br>hit alone.</h2>
+      <p>Malaysian youth face a fragmented system. Skills with nowhere to apply them. Stress with no one to talk to. Opportunities they never knew existed.</p>
+    </div>
+
+    <div class="problem-grid">
+      <div class="problem-card reveal visible">
+        <div class="problem-num">01 — Skills</div>
+        <div class="problem-icon" style="background:var(--grow-dim);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--grow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"></path><path d="M10 20c5.5-2.5.8-6.4 3-10"></path><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"></path><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"></path></svg>
+        </div>
+        <h3>Learning with no direction</h3>
+        <p>Self-taught youth don't know which skills matter. No feedback loop, no community, no pathway from learning to doing.</p>
+      </div>
+
+      <div class="problem-card reveal visible">
+        <div class="problem-num">02 — Mental Health</div>
+        <div class="problem-icon" style="background:var(--safe-dim);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+        </div>
+        <h3>Nowhere safe to talk</h3>
+        <p>Stigma around mental health means most students suffer silently. Counselors are scarce. Peers don't know what to say.</p>
+      </div>
+
+      <div class="problem-card reveal visible">
+        <div class="problem-num">03 — Opportunities</div>
+        <div class="problem-icon" style="background:var(--connect-dim);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--connect)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        </div>
+        <h3>Invisible opportunities</h3>
+        <p>Internships, volunteering, and youth programs exist — but discovery is broken. Word-of-mouth isn't a system.</p>
+      </div>
+
+      <div class="problem-card reveal visible">
+        <div class="problem-num">04 — Community</div>
+        <div class="problem-icon" style="background:var(--circle-dim);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--circle)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <h3>Isolated by default</h3>
+        <p>University and school environments rarely foster genuine peer connection across interests. Study groups never form. Mentors stay out of reach.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PLATFORM PILLARS ─────────────────────── -->
+<section id="pillars" style="padding-top:80px;">
+  <div class="container">
+    <div class="section-header reveal visible">
+      <span class="tag">02 — The Platform</span>
+      <h2>Four pillars.<br>One platform.</h2>
+      <p>HAVEN wraps skill development, opportunity discovery, community building, and mental health support into a single, AI-powered experience.</p>
+    </div>
+
+    <div class="pillars-grid">
+      <div class="pillar-card grow reveal visible">
+        <span class="pillar-label">Grow</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--grow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"></path><path d="M10 20c5.5-2.5.8-6.4 3-10"></path><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"></path><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"></path></svg>
+        </div>
+        <h3>Skills &amp; Challenges</h3>
+        <p>Share skills, join peer challenges, earn badges, and get AI-powered learning path recommendations tailored to the Malaysian job market.</p>
+      </div>
+
+      <div class="pillar-card connect reveal visible">
+        <span class="pillar-label">Connect</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--connect)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+        </div>
+        <h3>Opportunities Near You</h3>
+        <p>Discover volunteering, internships, and programs mapped to your location. AI matches you based on skills and interest — not connections.</p>
+      </div>
+
+      <div class="pillar-card circle reveal visible">
+        <span class="pillar-label">Circle</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--circle)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <h3>Interest Groups</h3>
+        <p>Join study circles, find accountability partners, and build genuine peer relationships around shared interests — online and in-person.</p>
+      </div>
+
+      <div class="pillar-card safe reveal visible">
+        <span class="pillar-label">Safe Space</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>
+        </div>
+        <h3>Private Support</h3>
+        <p>Talk to Rakan, our AI companion, or connect with trained peer listeners and licensed counselors — always anonymous, always safe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ──────────────────────────── -->
+<section id="how">
+  <div class="container">
+    <div class="section-header reveal visible" style="text-align:center; align-items:center; display:flex; flex-direction:column;">
+      <span class="tag">03 — How It Works</span>
+      <h2>Up and running<br>in 2 minutes.</h2>
+    </div>
+
+    <div class="steps">
+      <div class="step reveal visible">
+        <div class="step-num">01</div>
+        <h3>Build your profile</h3>
+        <p>Tell us your skills, interests, and goals. Takes under 2 minutes. No LinkedIn required.</p>
+      </div>
+      <div class="step reveal visible">
+        <div class="step-num">02</div>
+        <h3>AI learns your world</h3>
+        <p>HAVEN builds a personalised feed, opportunity matches, and learning path from day one — and improves as you use it.</p>
+      </div>
+      <div class="step reveal visible">
+        <div class="step-num">03</div>
+        <h3>Grow with your community</h3>
+        <p>Share wins, join challenges, find your circle, and reach out when you need support. The algorithm optimises for growth, not screen time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SAFE SPACE FEATURE ────────────────────── -->
+<section id="safe-space" class="safespace-section">
+  <div class="container">
+    <div class="safespace-inner">
+      <div class="reveal visible">
+        <span class="tag">04 — Safe Space</span>
+        <h2 style="font-family:var(--font-display);font-size:clamp(28px,3.5vw,44px);font-weight:600;letter-spacing:-0.025em;color:var(--cream);line-height:1.15;margin:20px 0 16px;">You don't have to<br>carry it alone.</h2>
+        <p style="font-size:15px;color:var(--cream-60);line-height:1.7;margin-bottom:24px;font-weight:300;">HAVEN's Safe Space is a private, stigma-free environment. Choose between Rakan (our AI companion), trained peer listeners, or licensed counselors. All conversations are anonymous by default.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream-60);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Anonymous by default — no name, no profile
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream-60);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            AI companion Rakan available 24/7
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--cream-60);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Data never shared with institutions
+          </div>
+        </div>
+        <div style="margin-top:28px;padding:14px 18px;background:rgba(255,138,128,0.08);border:1px solid rgba(255,138,128,0.2);border-radius:12px;font-size:13px;color:var(--cream-60);">
+          Crisis line — Befrienders Malaysia: <strong style="color:var(--safe);">03-7627 2929</strong> · Free, 24/7, confidential
+        </div>
+      </div>
+
+      <!-- Chat preview + wellbeing photo -->
+      <div class="reveal" style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- Wellbeing photo -->
+        <div class="wellbeing-img">
+          <img src="https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?w=800&q=80&fit=crop" alt="Youth wellbeing" loading="lazy">
+          <div class="wellbeing-img-overlay">
+            <div class="wellbeing-img-caption">You don't have to carry it <em>alone.</em></div>
+          </div>
+        </div>
+
+        <div class="safespace-chat">
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:20px;padding:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--safe-dim);display:flex;align-items:center;justify-content:center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--safe)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="10" x="3" y="11" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" x2="8" y1="16" y2="16"></line><line x1="16" x2="16" y1="16" y2="16"></line></svg>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--cream);">Rakan</div>
+              <div style="font-size:11px;color:var(--safe);">● Online · Anonymous session</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <div class="chat-sender">Rakan 🌿</div>
+              <div class="chat-bubble ai">Hi, I'm Rakan. This is a safe, anonymous space. How are you feeling today?</div>
+            </div>
+            <div style="align-self:flex-end;text-align:right;">
+              <div class="chat-sender" style="text-align:right;">You</div>
+              <div class="chat-bubble user">Exam season is really getting to me. I haven't been sleeping well.</div>
+            </div>
+            <div>
+              <div class="chat-sender">Rakan 🌿</div>
+              <div class="chat-bubble ai">I hear you. Exam stress is real and it takes a toll on your whole body. You're not alone in this. Would you like to talk through what's weighing on you most right now?</div>
+            </div>
+          </div>
+          <span class="anon-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            Anonymous by default
+          </span>
+        </div>
+        </div><!-- close safespace-chat -->
+      </div><!-- close column wrapper -->
+    </div><!-- close safespace-inner -->
+  </div><!-- close container -->
+</section>
+
+<!-- ── CTA ──────────────────────────────────── -->
+<section class="cta-section">
+  <div class="container">
+    <div class="reveal">
+      <span class="tag" style="justify-content:center;margin-bottom:24px;display:flex;">05 — Join HAVEN</span>
+      <h2>The support system<br>Malaysian youth were<br>never <em>given.</em></h2>
+      <p>Free to join. Private by design. Built for you.</p>
+      <div class="cta-actions">
+        <a href="#" class="btn-hero" style="font-size:15px;padding:14px 32px;">
+          Create your profile
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+        <a href="#pillars" class="btn-outline" style="font-size:15px;padding:14px 28px;">Explore the platform</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ───────────────────────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6BBF7A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 20h10"></path><path d="M10 20c5.5-2.5.8-6.4 3-10"></path>
+          <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"></path>
+          <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"></path>
+        </svg>
+        HAVEN
+      </div>
+      <div class="footer-links">
+        <a href="#">Feed</a>
+        <a href="#">Grow</a>
+        <a href="#">Connect</a>
+        <a href="#">Safe Space</a>
+      </div>
+      <div class="footer-copy">Privacy-first · Anonymous by default · © 2025 HAVEN</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Nav scroll behaviour
+const navEl = document.querySelector('nav');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 60) {
+    navEl.style.background = 'rgba(8,13,9,0.95)';
+  } else {
+    navEl.style.background = 'rgba(8,13,9,0.75)';
+  }
+});
+</script>
+
+
+</body></html>

@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from sentiment import analyze_text
+from sentiment import analyze_text, analyze_text_detailed
 from recommender import score_opportunity_match
 
-app = FastAPI(title="Tumbuh AI Microservice")
+app = FastAPI(title="HAVEN AI Microservice")
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,6 +31,12 @@ def health():
 @app.post("/sentiment")
 def sentiment_endpoint(body: TextInput):
     return analyze_text(body.text)
+
+
+@app.post("/sentiment-detailed")
+def sentiment_detailed_endpoint(body: TextInput):
+    """Extended analysis for Guardian module (WhatsApp + Instagram)."""
+    return analyze_text_detailed(body.text)
 
 
 @app.post("/match-opportunity")

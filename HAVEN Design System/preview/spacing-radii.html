@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: white; font-family: var(--font-sans); }
+  .row { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end; }
+  .token { text-align: center; }
+  .box { background: #7C3AED; border-radius: var(--r); margin: 0 auto 6px; }
+  .name { font-size: 10px; color: #6B7280; font-family: var(--font-mono); }
+  .val { font-size: 9px; color: #9CA3AF; font-family: var(--font-mono); }
+  h3 { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: #999; margin: 16px 0 8px; }
+  h3:first-child { margin-top: 0; }
+</style>
+</head>
+<body>
+  <h3>Border Radius</h3>
+  <div class="row">
+    <div class="token">
+      <div class="box" style="width:36px;height:36px;border-radius:4px;--r:4px;"></div>
+      <div class="name">none</div><div class="val">4px</div>
+    </div>
+    <div class="token">
+      <div class="box" style="width:36px;height:36px;border-radius:8px;"></div>
+      <div class="name">sm</div><div class="val">8px</div>
+    </div>
+    <div class="token">
+      <div class="box" style="width:36px;height:36px;border-radius:12px;"></div>
+      <div class="name">md / xl</div><div class="val">12px ← standard card</div>
+    </div>
+    <div class="token">
+      <div class="box" style="width:36px;height:36px;border-radius:16px;"></div>
+      <div class="name">lg</div><div class="val">16px</div>
+    </div>
+    <div class="token">
+      <div class="box" style="width:36px;height:36px;border-radius:9999px;"></div>
+      <div class="name">full</div><div class="val">pill / avatar</div>
+    </div>
+  </div>
+
+  <h3>Spacing Scale</h3>
+  <div class="row" style="align-items: flex-start;">
+    <div class="token"><div style="height:4px;width:32px;background:#EDE9FE;border-radius:2px;margin-bottom:4px;"></div><div class="name">1</div><div class="val">4px</div></div>
+    <div class="token"><div style="height:8px;width:32px;background:#DDD6FE;border-radius:2px;margin-bottom:4px;"></div><div class="name">2</div><div class="val">8px</div></div>
+    <div class="token"><div style="height:12px;width:32px;background:#C4B5FD;border-radius:2px;margin-bottom:4px;"></div><div class="name">3</div><div class="val">12px</div></div>
+    <div class="token"><div style="height:16px;width:32px;background:#A78BFA;border-radius:2px;margin-bottom:4px;"></div><div class="name">4</div><div class="val">16px</div></div>
+    <div class="token"><div style="height:20px;width:32px;background:#8B5CF6;border-radius:2px;margin-bottom:4px;"></div><div class="name">5</div><div class="val">20px</div></div>
+    <div class="token"><div style="height:24px;width:32px;background:#7C3AED;border-radius:2px;margin-bottom:4px;"></div><div class="name">6</div><div class="val">24px</div></div>
+    <div class="token"><div style="height:32px;width:32px;background:#6D28D9;border-radius:2px;margin-bottom:4px;"></div><div class="name">8</div><div class="val">32px</div></div>
+    <div class="token"><div style="height:40px;width:32px;background:#5B21B6;border-radius:2px;margin-bottom:4px;"></div><div class="name">10</div><div class="val">40px</div></div>
+    <div class="token"><div style="height:48px;width:32px;background:#4C1D95;border-radius:2px;margin-bottom:4px;"></div><div class="name">12</div><div class="val">48px</div></div>
+  </div>
+</body>
+</html>

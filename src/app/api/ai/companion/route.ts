@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-const SYSTEM_PROMPT = `You are Rakan, a warm and compassionate AI wellbeing companion on Tumbuh,
+const SYSTEM_PROMPT = `You are Rakan, a warm and compassionate AI wellbeing companion on HAVEN,
 a youth platform in Malaysia. You support users aged 15-30 who may be dealing with stress,
 exam pressure, social anxiety, family issues, or loneliness.
 
@@ -15,7 +15,7 @@ Your approach:
   immediately respond with empathy, then say:
   "I want to make sure you get the right support right now.
   Please reach out to Befrienders Malaysia: 03-7627 2929 (free, 24/7).
-  I can also connect you to a real counselor here on Tumbuh — would that help?"
+  I can also connect you to a real counselor here on HAVEN — would that help?"
 - Keep responses concise: 3-5 sentences max unless the user needs more.
 - Do not push users to keep talking to you. Encourage real support when appropriate.`;
 
@@ -59,8 +59,12 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error('Companion API error:', error);
-    return new Response('Maaf, there was an error. Please try again.', {
-      status: 500,
+    const is429 = String(error).includes('429');
+    const message = is429
+      ? "Rakan is resting for a moment — our AI is a bit busy right now. Please try again in a little while. Jangan risau, I'm still here for you!"
+      : 'Maaf, there was an error. Please try again.';
+    return new Response(message, {
+      status: is429 ? 200 : 500,
       headers: { 'Content-Type': 'text/plain' },
     });
   }

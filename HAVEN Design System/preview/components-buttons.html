@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: white; font-family: var(--font-sans); }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; align-items: center; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: all .15s; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+  .btn-xs { padding: 4px 10px; font-size: 11px; border-radius: 8px; }
+  h3 { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: #999; margin: 0 0 8px; }
+</style>
+</head>
+<body>
+  <h3>Primary</h3>
+  <div class="row">
+    <button class="btn" style="background:#7C3AED;color:white;">Get started free</button>
+    <button class="btn" style="background:#7C3AED;color:white;opacity:.6;" disabled>Disabled</button>
+    <button class="btn btn-sm" style="background:#7C3AED;color:white;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      Join Challenge
+    </button>
+    <button class="btn btn-xs" style="background:#7C3AED;color:white;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      Post
+    </button>
+  </div>
+
+  <h3>Secondary / Ghost</h3>
+  <div class="row">
+    <button class="btn" style="background:#F3F4F6;color:#374151;">Explore the feed</button>
+    <button class="btn btn-sm" style="background:#F3F4F6;color:#374151;">Cancel</button>
+    <button class="btn btn-sm" style="background:white;color:#374151;border:1.5px solid #E5E7EB;">Share</button>
+    <button class="btn btn-sm" style="background:white;color:#7C3AED;border:1.5px solid #DDD6FE;">View all</button>
+  </div>
+
+  <h3>Pillar-tinted</h3>
+  <div class="row">
+    <button class="btn btn-sm" style="background:#EDE9FE;color:#4C1D95;">Grow</button>
+    <button class="btn btn-sm" style="background:#D1FAE5;color:#065F46;">Connect</button>
+    <button class="btn btn-sm" style="background:#FEF3C7;color:#78350F;">Circle</button>
+    <button class="btn btn-sm" style="background:#FFE4E6;color:#9F1239;">Safe Space</button>
+  </div>
+
+  <h3>State — Success</h3>
+  <div class="row">
+    <button class="btn btn-sm" style="background:#D1FAE5;color:#065F46;cursor:default;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Joined!
+    </button>
+    <button class="btn btn-sm" style="background:#7C3AED;color:white;">Join Challenge</button>
+  </div>
+</body>
+</html>

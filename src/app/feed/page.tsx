@@ -106,7 +106,7 @@ export default function FeedPage() {
           <FeedFilter active={filter} onChange={setFilter} />
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-700 transition-colors shrink-0"
+            className="flex items-center gap-1.5 px-3 py-2 bg-sage-600 text-white rounded-xl text-sm font-medium hover:bg-sage-700 transition-colors shrink-0"
           >
             <Plus className="w-4 h-4" />
             Post
@@ -137,7 +137,7 @@ export default function FeedPage() {
         {!loading && filteredPosts.length === 0 && (
           <div className="text-center py-12 text-gray-400">
             <p className="text-sm">No posts yet in this pillar</p>
-            <button onClick={() => setShowCreate(true)} className="text-purple-600 text-sm mt-2 hover:underline">
+            <button onClick={() => setShowCreate(true)} className="text-sage-600 text-sm mt-2 hover:underline">
               Be the first to share something
             </button>
           </div>

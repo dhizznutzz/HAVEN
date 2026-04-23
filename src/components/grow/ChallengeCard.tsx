@@ -38,7 +38,7 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
   };
 
   return (
-    <div className="rounded-xl border border-gray-100 bg-white p-4 hover:border-purple-200 transition-colors">
+    <div className="rounded-xl border border-gray-100 bg-white p-4 hover:border-gray-200 transition-colors">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -73,7 +73,7 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             joined
               ? 'bg-green-100 text-green-700 cursor-default'
-              : 'bg-purple-600 text-white hover:bg-purple-700'
+              : 'bg-sage-600 text-white hover:bg-sage-700'
           }`}
         >
           {joined ? 'Joined!' : 'Join Challenge'}

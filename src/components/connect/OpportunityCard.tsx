@@ -12,7 +12,7 @@ interface OpportunityCardProps {
 const typeColors: Record<string, string> = {
   volunteer: 'bg-teal-100 text-teal-800',
   internship: 'bg-blue-100 text-blue-800',
-  program: 'bg-purple-100 text-purple-800',
+  program: 'bg-emerald-100 text-emerald-800',
   event: 'bg-amber-100 text-amber-800',
 };
 

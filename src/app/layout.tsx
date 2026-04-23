@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Space_Grotesk, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/layout/Navbar";
-import { BottomNav } from "@/components/layout/BottomNav";
+import { AuthProvider } from "@/components/AuthProvider";
+import { AppShell } from "@/components/layout/AppShell";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
@@ -10,8 +11,20 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-body",
+  subsets: ["latin"],
+  weight: ["300", "400", "500"],
+});
+
 export const metadata: Metadata = {
-  title: "Tumbuh — Grow Together",
+  title: "HAVEN — Grow Together",
   description:
     "A youth-focused AI-powered social platform for Malaysia. Skill development, community, mental health — all in one place.",
   keywords: ["youth", "Malaysia", "skills", "mental health", "community"],
@@ -23,11 +36,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} antialiased`}>
-      <body className="min-h-screen bg-gray-50 text-gray-900">
-        <Navbar />
-        <main className="md:pt-14 pb-16 md:pb-0">{children}</main>
-        <BottomNav />
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${spaceGrotesk.variable} ${dmSans.variable} antialiased`}>
+      <body className="min-h-screen bg-background text-foreground">
+        <ThemeProvider>
+          <AuthProvider>
+            <AppShell>{children}</AppShell>
+          </AuthProvider>
+        </ThemeProvider>
         <Toaster
           position="top-center"
           toastOptions={{

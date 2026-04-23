@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { margin: 0; padding: 20px; background: #F9FAFB; font-family: var(--font-sans); }
+  .card { background: white; border: 1px solid #F3F4F6; border-radius: 12px; padding: 16px; }
+  .card + .card { margin-top: 10px; }
+  .flex { display: flex; align-items: flex-start; gap: 12px; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 2px 8px; border-radius: 9999px; font-weight: 500; }
+  .tag { font-size: 11px; color: #7C3AED; }
+  .actions { display: flex; gap: 16px; margin-top: 12px; }
+  .action-btn { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #9CA3AF; background: none; border: none; cursor: pointer; }
+  h3 { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: #999; margin: 0 0 8px; }
+</style>
+</head>
+<body>
+  <h3>Post Card</h3>
+  <div class="card">
+    <div class="flex">
+      <div class="avatar" style="background:#EDE9FE;color:#4C1D95;">F</div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:13px;font-weight:500;color:#111827;">Fariz</span>
+          <span class="badge" style="background:#EDE9FE;color:#4C1D95;">🌱 Grow</span>
+          <span style="font-size:11px;color:#9CA3AF;margin-left:auto;">2h ago</span>
+        </div>
+        <p style="margin:8px 0 0;font-size:13px;color:#374151;line-height:1.6;">Just completed my first Python script to automate my study schedule! Coding really does solve real problems.</p>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <span class="tag">#python</span>
+          <span class="tag">#automation</span>
+          <span class="tag">#beginner</span>
+        </div>
+        <div class="actions">
+          <button class="action-btn" style="color:#EF4444;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            24
+          </button>
+          <button class="action-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <button class="action-btn" style="margin-left:auto;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:16px;">Challenge Card</h3>
+  <div class="card">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+      <div style="flex:1;">
+        <div style="display:flex;gap:6px;margin-bottom:4px;">
+          <span style="font-size:11px;font-weight:500;color:#7C3AED;">#python</span>
+          <span class="badge" style="background:#D1FAE5;color:#065F46;">beginner</span>
+        </div>
+        <div style="font-size:13px;font-weight:500;color:#111827;">Build a Python CLI tool</div>
+        <div style="font-size:11px;color:#6B7280;margin-top:3px;">Create a command-line tool that solves a real problem in your daily life.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;color:#D97706;flex-shrink:0;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        <span style="font-size:13px;font-weight:500;">50 XP</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;">
+      <div style="display:flex;gap:12px;">
+        <span style="font-size:11px;color:#9CA3AF;display:flex;gap:4px;align-items:center;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          234 joined
+        </span>
+        <span style="font-size:11px;color:#9CA3AF;display:flex;gap:4px;align-items:center;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          5d left
+        </span>
+      </div>
+      <button style="background:#7C3AED;color:white;border:none;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:500;cursor:pointer;">Join Challenge</button>
+    </div>
+  </div>
+</body>
+</html>

@@ -67,7 +67,7 @@ export function PostCard({ post }: PostCardProps) {
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {post.tags.map(tag => (
-                <span key={tag} className="text-xs text-purple-600 hover:underline cursor-pointer">
+                <span key={tag} className="text-xs text-sage-600 hover:underline cursor-pointer">
                   #{tag}
                 </span>
               ))}

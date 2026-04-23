@@ -5,6 +5,40 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* ── HAVEN brand: Sage Green ── */
+  --color-sage-50:  #EEF3EC;
+  --color-sage-100: #D4E8CE;
+  --color-sage-200: #B5D4BB;
+  --color-sage-400: #7FAD82;
+  --color-sage-600: #4E7A56;
+  --color-sage-700: #3C6142;
+  --color-sage-800: #2C4E34;
+  --color-sage-900: #1C3820;
+
+  /* ── Pillar: Grow (purple — semantic, not brand) ── */
+  --color-pillar-grow-bg:     #F5F3FF;
+  --color-pillar-grow-border: #DDD6FE;
+  --color-pillar-grow-text:   #6D28D9;
+  --color-pillar-grow-badge:  #EDE9FE;
+
+  /* ── Pillar: Connect (teal) ── */
+  --color-pillar-connect-bg:     #F0FDF4;
+  --color-pillar-connect-border: #BBF7D0;
+  --color-pillar-connect-text:   #065F46;
+  --color-pillar-connect-badge:  #D1FAE5;
+
+  /* ── Pillar: Circle (amber) ── */
+  --color-pillar-circle-bg:     #FFFBEB;
+  --color-pillar-circle-border: #FDE68A;
+  --color-pillar-circle-text:   #92400E;
+  --color-pillar-circle-badge:  #FEF3C7;
+
+  /* ── Pillar: Safe Space (rose) ── */
+  --color-pillar-safe-bg:     #FFF1F2;
+  --color-pillar-safe-border: #FECDD3;
+  --color-pillar-safe-text:   #9F1239;
+  --color-pillar-safe-badge:  #FFE4E6;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
@@ -55,8 +89,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.50 0.079 149.8);   /* sage-600 #4E7A56 */
+  --primary-foreground: oklch(1 0 0);   /* white */
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -126,5 +160,61 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  .haven-app-shell {
+    min-height: 100vh;
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  .haven-app-shell::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(40rem 30rem at 90% -10%, rgba(107, 191, 122, 0.08), transparent 60%),
+      radial-gradient(30rem 24rem at -5% 85%, rgba(157, 143, 255, 0.06), transparent 60%);
+    z-index: 0;
+  }
+
+  .haven-app-shell main {
+    position: relative;
+    z-index: 1;
+  }
+
+  .dark .haven-app-shell .bg-white,
+  .dark .haven-app-shell .bg-gray-50,
+  .dark .haven-app-shell .bg-gray-100 {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+  }
+
+  .dark .haven-app-shell .border-gray-100,
+  .dark .haven-app-shell .border-gray-200 {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .dark .haven-app-shell .text-gray-900 {
+    color: #edeae2 !important;
+  }
+
+  .dark .haven-app-shell .text-gray-800,
+  .dark .haven-app-shell .text-gray-700 {
+    color: rgba(237, 234, 226, 0.86) !important;
+  }
+
+  .dark .haven-app-shell .text-gray-600,
+  .dark .haven-app-shell .text-gray-500,
+  .dark .haven-app-shell .text-gray-400 {
+    color: rgba(237, 234, 226, 0.62) !important;
+  }
+
+  .light .haven-app-shell::before {
+    background:
+      radial-gradient(38rem 28rem at 90% -10%, rgba(107, 191, 122, 0.14), transparent 60%),
+      radial-gradient(26rem 22rem at -5% 85%, rgba(107, 191, 122, 0.08), transparent 60%);
   }
 }

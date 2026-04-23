@@ -1,4 +1,3 @@
-import { Progress } from '@/components/ui/progress';
 import { Star } from 'lucide-react';
 
 interface LevelProgressProps {
@@ -29,7 +28,12 @@ export function LevelProgress({ level, points }: LevelProgressProps) {
           <p className="text-xs font-medium text-purple-600">{POINTS_PER_LEVEL - pointsInLevel} XP</p>
         </div>
       </div>
-      <Progress value={progress} className="h-2" />
+      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-purple-600 rounded-full transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
       <p className="text-xs text-gray-400 mt-1">{pointsInLevel}/{POINTS_PER_LEVEL} XP to Level {level + 1}</p>
     </div>
   );

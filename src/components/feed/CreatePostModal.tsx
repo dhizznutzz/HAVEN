@@ -147,7 +147,7 @@ export function CreatePostModal({ open, onClose, onCreated, defaultPillar = 'gro
                 ? "Share how you're feeling... this space is safe and anonymous."
                 : "What's on your mind?"
             }
-            className="w-full min-h-[120px] text-sm text-gray-700 placeholder:text-gray-400 border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400"
+            className="w-full min-h-[120px] text-sm text-gray-700 placeholder:text-gray-400 border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-sage-100 focus:border-sage-400"
             maxLength={1000}
           />
 
@@ -174,7 +174,7 @@ export function CreatePostModal({ open, onClose, onCreated, defaultPillar = 'gro
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 text-xs text-gray-400 hover:text-purple-500 transition-colors"
+              className="flex items-center gap-2 text-xs text-gray-400 hover:text-sage-600 transition-colors"
             >
               <ImagePlus className="w-4 h-4" />
               Add photo
@@ -186,7 +186,7 @@ export function CreatePostModal({ open, onClose, onCreated, defaultPillar = 'gro
             value={tagsInput}
             onChange={e => setTagsInput(e.target.value)}
             placeholder="Tags: python, design, wellbeing (comma separated)"
-            className="w-full text-sm text-gray-700 placeholder:text-gray-400 border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-200"
+            className="w-full text-sm text-gray-700 placeholder:text-gray-400 border border-gray-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sage-100"
           />
 
           <div className="flex items-center justify-between">
@@ -208,7 +208,7 @@ export function CreatePostModal({ open, onClose, onCreated, defaultPillar = 'gro
             <button
               type="submit"
               disabled={!content.trim() || loading}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-medium hover:bg-purple-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors ml-auto"
+              className="flex items-center gap-2 px-4 py-2 bg-sage-600 text-white rounded-xl text-sm font-medium hover:bg-sage-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors ml-auto"
             >
               <Send className="w-3.5 h-3.5" />
               {loading ? 'Sharing...' : 'Share'}

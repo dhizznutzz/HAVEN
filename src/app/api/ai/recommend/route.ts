@@ -34,6 +34,16 @@ export async function POST(req: Request) {
     return Response.json(JSON.parse(cleaned));
   } catch (error) {
     console.error('Recommend API error:', error);
+    const is429 = String(error).includes('429');
+    if (is429) {
+      return Response.json({
+        skills: [
+          { name: 'Python', reason: 'High demand in Malaysian tech sector', resources: ['freeCodeCamp', 'CS50P'] },
+          { name: 'UI/UX Design', reason: 'Growing market for digital products', resources: ['Figma Community', 'Google UX Certificate'] },
+          { name: 'Data Analysis', reason: 'Essential for modern business roles', resources: ['Kaggle', 'Google Data Analytics'] },
+        ],
+      });
+    }
     return Response.json({ skills: [] }, { status: 500 });
   }
 }
