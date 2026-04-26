@@ -2,15 +2,18 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { PostCard } from '@/components/feed/PostCard';
 import { FeedFilter } from '@/components/feed/FeedFilter';
 import { CreatePostModal } from '@/components/feed/CreatePostModal';
 import { PillarSidebar } from '@/components/layout/PillarSidebar';
+import { LikeRecommendations } from '@/components/feed/LikeRecommendations';
 import { Post, Pillar } from '@/types';
+import { ALL_CIRCLES } from '@/data/circles-data';
+import { createClient } from '@/lib/supabase/client';
+import toast from 'react-hot-toast';
 
-// Sample seed data for demo when Supabase is not connected
 const DEMO_POSTS: Post[] = [
   {
     id: '1',
@@ -29,7 +32,7 @@ const DEMO_POSTS: Post[] = [
   {
     id: '2',
     author_id: 'a2',
-    content: 'Looking for volunteers for our Hari Raya community clean-up in Cheras this Saturday! Free lunch provided. Let\'s make our neighbourhood shine ✨',
+    content: "Looking for volunteers for our Hari Raya community clean-up in Cheras this Saturday! Free lunch provided. Let's make our neighbourhood shine ✨",
     pillar: 'connect',
     tags: ['volunteer', 'community', 'kuala-lumpur'],
     is_anonymous: false,
@@ -43,7 +46,7 @@ const DEMO_POSTS: Post[] = [
   {
     id: '3',
     author_id: 'a3',
-    content: 'Exam season is rough. Anyone else feel like they\'re running on 3 hours of sleep and pure anxiety? SPM really tests more than just knowledge 😮‍💨',
+    content: "Exam season is rough. Anyone else feel like they're running on 3 hours of sleep and pure anxiety? SPM really tests more than just knowledge 😮‍💨",
     pillar: 'safe_space',
     tags: ['exam', 'stress'],
     is_anonymous: true,
@@ -70,11 +73,53 @@ const DEMO_POSTS: Post[] = [
   },
 ];
 
+interface CircleRec { id: string; name: string; emoji: string; category: string; member_count: number; }
+interface SkillRec { name: string; reason: string; resources: string[]; }
+
+const FALLBACK_SKILLS: SkillRec[] = [
+  { name: 'Python Programming', reason: 'High demand in Malaysian tech and data roles', resources: ['freeCodeCamp', 'CS50P'] },
+  { name: 'UI/UX Design', reason: 'Growing need for product designers in KL', resources: ['Figma Community', 'Google UX Certificate'] },
+  { name: 'Public Speaking', reason: 'Valued across every Malaysian career path', resources: ['Toastmasters Malaysia', 'TED Masterclass'] },
+];
+
+function computeLocalRecs(liked: Post[]) {
+  const tags = liked.flatMap(p => p.tags ?? []);
+  const pillars = [...new Set(liked.map(p => p.pillar))];
+
+  const scored = ALL_CIRCLES.map(c => ({
+    id: c.id, name: c.name, emoji: c.emoji, category: c.category, member_count: c.member_count,
+    score: c.interest_tags.filter(t => tags.some(ut => ut.includes(t) || t.includes(ut))).length,
+  }));
+  const topCircles = scored.filter(c => c.score > 0).sort((a, b) => b.score - a.score).slice(0, 3);
+  const circles: CircleRec[] = topCircles.length > 0
+    ? topCircles
+    : ALL_CIRCLES.slice(0, 3).map(c => ({ id: c.id, name: c.name, emoji: c.emoji, category: c.category, member_count: c.member_count }));
+
+  const oppTypes = pillars.includes('connect') ? ['volunteer', 'program']
+    : pillars.includes('grow') ? ['internship', 'program']
+    : ['internship', 'volunteer'];
+
+  return { circles, skills: FALLBACK_SKILLS, oppTypes };
+}
+
 export default function FeedPage() {
   const [posts, setPosts] = useState<Post[]>(DEMO_POSTS);
   const [filter, setFilter] = useState<Pillar | 'all'>('all');
   const [showCreate, setShowCreate] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Likes tracking
+  const likedPostsRef = useRef<Map<string, Post>>(new Map());
+  const [likedCount, setLikedCount] = useState(0);
+  const [showReco, setShowReco] = useState(false);
+  const [aiRefining, setAiRefining] = useState(false);
+  const [recoCircles, setRecoCircles] = useState<CircleRec[]>([]);
+  const [recoSkills, setRecoSkills] = useState<SkillRec[]>([]);
+  const [recoOppTypes, setRecoOppTypes] = useState<string[]>([]);
+  const [recoSummary, setRecoSummary] = useState('');
+  const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
+  const fetchAbortRef = useRef<AbortController | null>(null);
+  const supabase = createClient();
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -85,7 +130,7 @@ export default function FeedPage() {
         if (data.length > 0) setPosts(data);
       }
     } catch {
-      // Keep demo posts on error
+      // keep demo posts
     } finally {
       setLoading(false);
     }
@@ -93,9 +138,86 @@ export default function FeedPage() {
 
   useEffect(() => { fetchPosts(); }, [filter]);
 
-  const filteredPosts = filter === 'all'
-    ? posts
-    : posts.filter(p => p.pillar === filter);
+  // Load joined circle IDs
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase.from('circle_members').select('circle_id').eq('user_id', user.id)
+        .then(({ data }) => {
+          if (data) setJoinedIds(new Set(data.map((r: { circle_id: string }) => r.circle_id)));
+        });
+    });
+  }, []);
+
+  const fetchRecommendations = useCallback(async (liked: Post[]) => {
+    fetchAbortRef.current?.abort();
+    const ctrl = new AbortController();
+    fetchAbortRef.current = ctrl;
+
+    setAiRefining(true);
+    try {
+      const payload = liked.map(p => ({ tags: p.tags, pillar: p.pillar, content: p.content }));
+      const res = await fetch('/api/ai/feed-recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ likedPosts: payload }),
+        signal: ctrl.signal,
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setRecoCircles(data.circles ?? []);
+      setRecoSkills(data.skills ?? []);
+      setRecoOppTypes(data.opportunity_types ?? []);
+      setRecoSummary(data.summary ?? '');
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return;
+    } finally {
+      setAiRefining(false);
+    }
+  }, []);
+
+  const handlePostLike = useCallback((post: Post) => {
+    const map = likedPostsRef.current;
+    if (map.has(post.id)) return;
+    map.set(post.id, post);
+    const allPosts = [...map.values()];
+    setLikedCount(map.size);
+
+    // Show local recs immediately so the panel renders with content
+    const local = computeLocalRecs(allPosts);
+    setRecoCircles(local.circles);
+    setRecoSkills(local.skills);
+    setRecoOppTypes(local.oppTypes);
+    setShowReco(true);
+
+    // AI refines in background
+    fetchRecommendations(allPosts);
+  }, [fetchRecommendations]);
+
+  const handleJoinCircle = async (circleId: string) => {
+    const circle = ALL_CIRCLES.find(c => c.id === circleId);
+    if (!circle) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setJoinedIds(prev => new Set([...prev, circleId]));
+      toast.success(`Joined ${circle.name}!`);
+      return;
+    }
+    const res = await fetch('/api/circles/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ circle_id: circleId }),
+    });
+    if (res.ok) {
+      setJoinedIds(prev => new Set([...prev, circleId]));
+      toast.success(`Joined ${circle.name}!`);
+    } else {
+      const err = await res.json();
+      toast.error(err.error || 'Failed to join');
+    }
+  };
+
+  const filteredPosts = filter === 'all' ? posts : posts.filter(p => p.pillar === filter);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 flex gap-6">
@@ -112,6 +234,21 @@ export default function FeedPage() {
             Post
           </button>
         </div>
+
+        {/* AI recommendation panel — shown after first like */}
+        {showReco && likedCount > 0 && (
+          <LikeRecommendations
+            likedCount={likedCount}
+            circles={recoCircles}
+            skills={recoSkills}
+            opportunityTypes={recoOppTypes}
+            summary={recoSummary}
+            aiRefining={aiRefining}
+            onDismiss={() => setShowReco(false)}
+            joinedCircleIds={joinedIds}
+            onJoinCircle={handleJoinCircle}
+          />
+        )}
 
         {loading && (
           <div className="space-y-3">
@@ -131,7 +268,7 @@ export default function FeedPage() {
         )}
 
         {!loading && filteredPosts.map(post => (
-          <PostCard key={post.id} post={post} />
+          <PostCard key={post.id} post={post} onLike={handlePostLike} />
         ))}
 
         {!loading && filteredPosts.length === 0 && (

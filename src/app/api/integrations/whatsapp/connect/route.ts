@@ -14,44 +14,57 @@ export async function POST(req: Request) {
 
   const clean = phoneNumber.replace(/\s/g, '');
 
-  // Save integration (upsert in case they reconnect)
-  const { error } = await supabase.from('whatsapp_integrations').upsert(
+  // Save integration — always do this first so the user is connected regardless
+  const { error: dbError } = await supabase.from('whatsapp_integrations').upsert(
     {
-      user_id: user.id,
-      phone_number: clean,
+      user_id:           user.id,
+      phone_number:      clean,
       checkin_frequency: frequency,
-      checkin_time: checkinTime,
-      is_active: true,
-      consent_given_at: new Date().toISOString(),
+      checkin_time:      checkinTime,
+      is_active:         true,
+      consent_given_at:  new Date().toISOString(),
     },
-    { onConflict: 'user_id' }
+    { onConflict: 'user_id' },
   );
 
-  if (error) return Response.json({ error: error.message }, { status: 500 });
+  if (dbError) return Response.json({ error: dbError.message }, { status: 500 });
 
-  // Send a welcome / first check-in immediately
-  const template = getCheckinTemplate();
-  await sendCheckinMessage(clean);
+  // Attempt to send welcome message — but never let a Twilio error block the response
+  let welcomeSent = false;
+  let rateLimited = false;
+  try {
+    const template = getCheckinTemplate();
+    await sendCheckinMessage(clean);
+    welcomeSent = true;
 
-  await supabase.from('whatsapp_checkins').insert({
-    user_id: user.id,
-    message_sent: template,
+    await supabase.from('whatsapp_checkins').insert({
+      user_id:      user.id,
+      message_sent: template,
+    });
+    await supabase.from('whatsapp_integrations')
+      .update({ last_checkin_sent_at: new Date().toISOString() })
+      .eq('user_id', user.id);
+  } catch (err: any) {
+    // Twilio sandbox 5 msg/day limit (code 63038) or any other send failure
+    rateLimited = err?.code === 63038 || err?.status === 429;
+    console.warn('[WA connect] welcome message not sent:', err?.message ?? err);
+  }
+
+  return Response.json({
+    success: true,
+    welcome_sent: welcomeSent,
+    // Tell the client why if the welcome message didn't go through
+    ...(rateLimited && {
+      warning: 'Connected successfully! The Twilio sandbox daily message limit has been reached — your first check-in will arrive tomorrow.',
+    }),
   });
-
-  await supabase.from('whatsapp_integrations')
-    .update({ last_checkin_sent_at: new Date().toISOString() })
-    .eq('user_id', user.id);
-
-  return Response.json({ success: true });
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-  // Cascade delete removes checkins too via FK
   await supabase.from('whatsapp_integrations').delete().eq('user_id', user.id);
-
   return Response.json({ success: true });
 }

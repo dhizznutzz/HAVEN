@@ -56,7 +56,6 @@ export function Navbar() {
           { href: '/feed',       label: 'Feed' },
           { href: '/grow',       label: 'Grow' },
           { href: '/connect',    label: 'Connect' },
-          { href: '/guardian',   label: 'Guardian' },
           { href: '/safe-space', label: 'Safe Space' },
         ].map(({ href, label }) => (
           <Link

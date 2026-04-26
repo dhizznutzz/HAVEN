@@ -9,9 +9,10 @@ import { createClient } from '@/lib/supabase/client';
 
 interface PostCardProps {
   post: Post;
+  onLike?: (post: Post) => void;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post, onLike }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(post.likes);
   const supabase = createClient();
@@ -25,6 +26,7 @@ export function PostCard({ post }: PostCardProps) {
     const newLiked = !liked;
     setLiked(newLiked);
     setLikes(prev => newLiked ? prev + 1 : prev - 1);
+    if (newLiked) onLike?.(post);
     await supabase
       .from('posts')
       .update({ likes: newLiked ? likes + 1 : likes - 1 })

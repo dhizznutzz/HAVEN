@@ -74,6 +74,24 @@ export default function GrowPage() {
   const [userProfile, setUserProfile] = useState({ level: 3, points: 430, skills: ['Python', 'Design'] as string[] });
   const supabase = createClient();
 
+  const handleChallengeJoin = async (xp: number) => {
+    // Update UI immediately
+    setUserProfile(prev => {
+      const newPoints = prev.points + xp;
+      return { ...prev, points: newPoints, level: Math.floor(newPoints / 200) + 1 };
+    });
+    // Persist in background
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase.from('profiles').select('points').eq('id', user.id).single();
+    if (!data) return;
+    const newPoints = (data.points || 0) + xp;
+    await supabase.from('profiles').update({
+      points: newPoints,
+      level: Math.floor(newPoints / 200) + 1,
+    }).eq('id', user.id);
+  };
+
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -129,7 +147,9 @@ export default function GrowPage() {
           <section>
             <h2 className="text-sm font-medium text-gray-700 mb-3">Active Challenges</h2>
             <div className="space-y-3">
-              {DEMO_CHALLENGES.map(c => <ChallengeCard key={c.id} challenge={c} />)}
+              {DEMO_CHALLENGES.map(c => (
+                <ChallengeCard key={c.id} challenge={c} onJoin={handleChallengeJoin} />
+              ))}
             </div>
           </section>
 

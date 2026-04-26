@@ -2,14 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sprout, MapPin, Users, Heart, LayoutGrid } from 'lucide-react';
+import { Sprout, MapPin, Heart, LayoutGrid } from 'lucide-react';
 
 const pillars = [
-  { href: '/feed', label: 'All Pillars', icon: LayoutGrid, color: 'text-gray-600' },
-  { href: '/grow', label: 'Grow', icon: Sprout, color: 'text-purple-600' },
-  { href: '/connect', label: 'Connect', icon: MapPin, color: 'text-teal-600' },
-  { href: '/circle', label: 'Circle', icon: Users, color: 'text-amber-600' },
-  { href: '/safe-space', label: 'Safe Space', icon: Heart, color: 'text-rose-600' },
+  { href: '/feed',       label: 'All Pillars', icon: LayoutGrid, color: 'text-gray-600' },
+  { href: '/grow',       label: 'Grow',        icon: Sprout,     color: 'text-purple-600' },
+  { href: '/connect',    label: 'Community',   icon: MapPin,     color: 'text-teal-600' },
+  { href: '/safe-space', label: 'Safe Space',  icon: Heart,      color: 'text-rose-600' },
 ];
 
 export function PillarSidebar() {

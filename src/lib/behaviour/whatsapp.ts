@@ -42,7 +42,34 @@ export async function sendCrisisMessage(phoneNumber: string): Promise<void> {
   await getClient().messages.create({
     from: HAVEN_WA_NUMBER(),
     to: `whatsapp:${phoneNumber}`,
-    body: `HAVEN noticed you might be having a really tough time 💙\n\nYou're not alone. Please reach out:\n\n📞 Befrienders Malaysia: 03-7627 2929 (free, 24/7)\n\nOr open HAVEN now to talk to our AI companion or find a peer listener:\nhaven.my/safe-space\n\nWe care about you.`,
+    body: `HAVEN noticed you might be having a really tough time 💙\n\nYou're not alone. Please reach out:\n\n📞 Befrienders Malaysia: 03-7627 2929 (free, 24/7)\n\nOr open HAVEN now to talk to our AI companion or find a counselor:\nhaven.my/safe-space\n\nWe care about you.`,
+  });
+}
+
+export function buildLowWellbeingReply(score: 1 | 2): string {
+  const base = process.env.NEXT_PUBLIC_URL ?? 'https://haven.my';
+  const rakanLink     = `${base}/safe-space/session?mode=ai_companion`;
+  const counselorLink = `${base}/safe-space/session?mode=counselor`;
+
+  const opening = score === 1
+    ? `You seem really low today 💙 That takes courage to share — thank you.`
+    : `You seem quite low today 💙 I hear you, and that's okay.`;
+
+  return (
+    `${opening}\n\n` +
+    `Please pick an option to relieve and share your feelings:\n\n` +
+    `*1. Talk to Rakan* — our AI companion, available right now\n${rakanLink}\n\n` +
+    `*2. Talk to a Counselor* — connect with a professional\n${counselorLink}\n\n` +
+    `📞 Need immediate help? Befrienders Malaysia: 03-7627 2929 (free, 24/7)\n\n` +
+    `You're not alone. 🌱`
+  );
+}
+
+export async function sendLowWellbeingReply(phoneNumber: string, score: 1 | 2): Promise<void> {
+  await getClient().messages.create({
+    from: HAVEN_WA_NUMBER(),
+    to: `whatsapp:${phoneNumber}`,
+    body: buildLowWellbeingReply(score),
   });
 }
 

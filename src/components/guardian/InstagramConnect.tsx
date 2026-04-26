@@ -56,16 +56,16 @@ export function InstagramConnect({
   if (connected) {
     return (
       <div className="space-y-3">
-        <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 p-4">
+        <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                <Check className="w-4 h-4 text-purple-400" />
+              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                <Check className="w-4 h-4 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-white">@{username}</p>
+                <p className="text-sm font-medium text-gray-900">@{username}</p>
                 {lastSynced && (
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     Synced {formatDistanceToNow(new Date(lastSynced), { addSuffix: true })}
                   </p>
                 )}
@@ -75,7 +75,7 @@ export function InstagramConnect({
               <button
                 onClick={handleSync}
                 disabled={syncing}
-                className="text-xs text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                className="text-xs text-purple-600 hover:text-purple-800 flex items-center gap-1"
               >
                 {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
                 Sync
@@ -83,7 +83,7 @@ export function InstagramConnect({
               <button
                 onClick={handleDisconnect}
                 disabled={disconnecting}
-                className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+                className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1"
               >
                 {disconnecting ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
                 Disconnect
@@ -96,9 +96,9 @@ export function InstagramConnect({
           <div className="space-y-2">
             <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Recent posts analysed</p>
             {recentPosts.slice(0, 5).map((post, i) => (
-              <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-white/5">
+              <div key={i} className="flex items-start gap-2 p-2 rounded-lg bg-gray-50 border border-gray-100">
                 <SentimentDot score={post.sentiment_score} riskLevel={post.risk_level} />
-                <p className="text-xs text-gray-300 line-clamp-2 flex-1">{post.caption}</p>
+                <p className="text-xs text-gray-700 line-clamp-2 flex-1">{post.caption}</p>
               </div>
             ))}
           </div>
@@ -109,7 +109,7 @@ export function InstagramConnect({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-gray-500">
         Connect your Instagram to let HAVEN analyse your post captions for sentiment trends.
         We only request caption text — no DMs, followers, or images.
       </p>

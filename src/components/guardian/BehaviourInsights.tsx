@@ -24,11 +24,11 @@ export function BehaviourInsights() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="h-32 animate-pulse rounded-xl bg-white/5" />;
+  if (loading) return <div className="h-32 animate-pulse rounded-xl bg-gray-100" />;
 
   if (snapshots.length === 0) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4 text-center">
+      <div className="rounded-xl border border-gray-100 bg-gray-50 p-4 text-center">
         <p className="text-sm text-gray-500">No activity recorded yet — start using HAVEN to build your insights.</p>
       </div>
     );
@@ -56,35 +56,35 @@ export function BehaviourInsights() {
           { label: 'Safe Space', value: safeSpaceVisits },
           { label: 'Late nights', value: lateNights, warn: lateNights >= 3 },
         ].map(stat => (
-          <div key={stat.label} className={`rounded-lg p-3 text-center ${stat.warn ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-white/5'}`}>
-            <p className={`text-lg font-bold ${stat.warn ? 'text-amber-400' : 'text-white'}`}>{stat.value}</p>
+          <div key={stat.label} className={`rounded-lg p-3 text-center ${stat.warn ? 'bg-amber-50 border border-amber-200' : 'bg-gray-50 border border-gray-100'}`}>
+            <p className={`text-lg font-bold ${stat.warn ? 'text-amber-600' : 'text-gray-900'}`}>{stat.value}</p>
             <p className="text-xs text-gray-500">{stat.label}</p>
           </div>
         ))}
       </div>
 
       {/* Activity chart */}
-      <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+      <div className="rounded-xl border border-gray-100 bg-white p-4">
         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide mb-3">7-Day Activity</p>
         <ResponsiveContainer width="100%" height={80}>
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="gradPosts" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#a855f7" stopOpacity={0.4} />
+                <stop offset="0%" stopColor="#a855f7" stopOpacity={0.3} />
                 <stop offset="100%" stopColor="#a855f7" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#6b7280' }} axisLine={false} tickLine={false} />
+            <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
             <Tooltip
-              contentStyle={{ background: '#111', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, fontSize: 12 }}
-              labelStyle={{ color: '#9ca3af' }}
+              contentStyle={{ background: '#fff', border: '1px solid #f3f4f6', borderRadius: 8, fontSize: 12 }}
+              labelStyle={{ color: '#6b7280' }}
             />
             <Area type="monotone" dataKey="Posts" stroke="#a855f7" fill="url(#gradPosts)" strokeWidth={2} dot={false} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
-      <p className="text-xs text-gray-600 text-center">
+      <p className="text-xs text-gray-400 text-center">
         This runs entirely within HAVEN. No data leaves the platform.
       </p>
     </div>

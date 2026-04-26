@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, Minus, RefreshCw } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface WellbeingScore {
   score: number;
@@ -26,7 +26,7 @@ export function WellbeingScoreCard() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 animate-pulse h-48" />
+      <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6 animate-pulse h-48" />
     );
   }
 
@@ -44,14 +44,14 @@ export function WellbeingScoreCard() {
   const trendLabel =
     trend === 'improving' ? 'Improving' : trend === 'declining' ? 'Declining' : trend === 'critical' ? 'Critical' : 'Stable';
   const trendColor =
-    trend === 'improving' ? 'text-green-400' : trend === 'declining' ? 'text-amber-400' : trend === 'critical' ? 'text-red-400' : 'text-gray-400';
+    trend === 'improving' ? 'text-green-600' : trend === 'declining' ? 'text-amber-600' : trend === 'critical' ? 'text-red-600' : 'text-gray-400';
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-semibold text-white">Your Wellbeing Score</h3>
-          <p className="text-xs text-gray-400 mt-0.5">Private — only you can see this</p>
+          <h3 className="font-semibold text-gray-900">Your Wellbeing Score</h3>
+          <p className="text-xs text-gray-500 mt-0.5">Private — only you can see this</p>
         </div>
         <div className={`flex items-center gap-1 text-sm font-medium ${trendColor}`}>
           <TrendIcon className="w-4 h-4" />
@@ -63,7 +63,7 @@ export function WellbeingScoreCard() {
         {/* Circular progress ring */}
         <div className="relative flex-shrink-0">
           <svg width="128" height="128" className="-rotate-90">
-            <circle cx="64" cy="64" r="54" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="10" />
+            <circle cx="64" cy="64" r="54" fill="none" stroke="#f3f4f6" strokeWidth="10" />
             <circle
               cx="64" cy="64" r="54" fill="none"
               stroke={color} strokeWidth="10"
@@ -74,7 +74,7 @@ export function WellbeingScoreCard() {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-bold text-white">{score}</span>
+            <span className="text-3xl font-bold text-gray-900">{score}</span>
             <span className="text-xs text-gray-400">/100</span>
           </div>
         </div>
@@ -91,15 +91,15 @@ export function WellbeingScoreCard() {
             <ScoreBar label="Instagram" value={data.instagram_score} />
           )}
           {data?.score_7day_avg != null && (
-            <p className="text-xs text-gray-500 pt-1">
+            <p className="text-xs text-gray-400 pt-1">
               7-day avg: {Math.round(data.score_7day_avg)}
             </p>
           )}
         </div>
       </div>
 
-      <p className="text-xs text-gray-500 mt-4 border-t border-white/5 pt-3">
-        📞 Befrienders Malaysia: <span className="font-medium text-gray-400">03-7627 2929</span> (free, 24/7)
+      <p className="text-xs text-gray-400 mt-4 border-t border-gray-100 pt-3">
+        📞 Befrienders Malaysia: <span className="font-medium text-gray-600">03-7627 2929</span> (free, 24/7)
       </p>
     </div>
   );
@@ -109,11 +109,11 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
   const color = value >= 70 ? 'bg-green-500' : value >= 40 ? 'bg-amber-500' : 'bg-red-500';
   return (
     <div>
-      <div className="flex justify-between text-xs text-gray-400 mb-1">
+      <div className="flex justify-between text-xs text-gray-500 mb-1">
         <span>{label}</span>
         <span>{value}</span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/10">
+      <div className="h-1.5 rounded-full bg-gray-100">
         <div className={`h-1.5 rounded-full ${color}`} style={{ width: `${value}%`, transition: 'width 0.6s ease' }} />
       </div>
     </div>

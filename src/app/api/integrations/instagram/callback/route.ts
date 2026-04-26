@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   const error = searchParams.get('error');
 
   if (error || !code) {
-    return Response.redirect(`${process.env.NEXT_PUBLIC_URL}/guardian?error=cancelled`);
+    return Response.redirect(`${process.env.NEXT_PUBLIC_URL}/safe-space?tab=guardian&error=cancelled`);
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     ({ accessToken, expiresIn } = await exchangeCodeForToken(code));
     igUser = await getInstagramUser(accessToken);
   } catch (err: any) {
-    return Response.redirect(`${process.env.NEXT_PUBLIC_URL}/guardian?error=ig_auth_failed`);
+    return Response.redirect(`${process.env.NEXT_PUBLIC_URL}/safe-space?tab=guardian&error=ig_auth_failed`);
   }
 
   await supabase.from('instagram_integrations').upsert(
@@ -47,5 +47,5 @@ export async function GET(req: Request) {
     body: JSON.stringify({ userId: user.id }),
   }).catch(() => {});
 
-  return Response.redirect(`${process.env.NEXT_PUBLIC_URL}/guardian?connected=instagram`);
+  return Response.redirect(`${process.env.NEXT_PUBLIC_URL}/safe-space?tab=guardian&connected=instagram`);
 }

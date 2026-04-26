@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Bot, Users, User } from 'lucide-react';
+import { Bot, User } from 'lucide-react';
 
 const modes = [
   {
@@ -14,17 +14,6 @@ const modes = [
     iconColor: 'text-rose-500',
     badge: 'Available now',
     badgeColor: 'bg-rose-100 text-rose-700',
-  },
-  {
-    id: 'peer_listener',
-    icon: Users,
-    title: 'Peer Listener',
-    subtitle: 'Trained youth volunteer',
-    description: 'Chat with a trained peer listener from our community. Anonymous.',
-    color: 'border-amber-200 hover:border-amber-400 hover:bg-amber-50',
-    iconColor: 'text-amber-500',
-    badge: '~5 min wait',
-    badgeColor: 'bg-amber-100 text-amber-700',
   },
   {
     id: 'counselor',

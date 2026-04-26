@@ -38,7 +38,12 @@ export function WhatsAppConnect({ connected, phoneNumber, onConnected, onDisconn
     setSaving(false);
 
     if (res.ok) {
-      toast.success('WhatsApp connected! A welcome message is on its way 💙');
+      const data = await res.json().catch(() => ({}));
+      if (data.warning) {
+        toast(data.warning, { icon: '⚠️', duration: 6000 });
+      } else {
+        toast.success('WhatsApp connected! A welcome message is on its way 💙');
+      }
       onConnected();
     } else {
       let message = 'Connection failed';
@@ -61,21 +66,21 @@ export function WhatsAppConnect({ connected, phoneNumber, onConnected, onDisconn
 
   if (connected) {
     return (
-      <div className="rounded-xl border border-green-500/20 bg-green-500/5 p-4">
+      <div className="rounded-xl border border-green-200 bg-green-50 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-              <Check className="w-4 h-4 text-green-400" />
+            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+              <Check className="w-4 h-4 text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">WhatsApp connected</p>
-              <p className="text-xs text-gray-400">{phoneNumber}</p>
+              <p className="text-sm font-medium text-gray-900">WhatsApp connected</p>
+              <p className="text-xs text-gray-500">{phoneNumber}</p>
             </div>
           </div>
           <button
             onClick={handleDisconnect}
             disabled={disconnecting}
-            className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+            className="text-xs text-red-500 hover:text-red-700 flex items-center gap-1"
           >
             {disconnecting ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
             Disconnect
@@ -88,40 +93,40 @@ export function WhatsAppConnect({ connected, phoneNumber, onConnected, onDisconn
   return (
     <form onSubmit={handleConnect} className="space-y-3">
       <div>
-        <label className="block text-xs text-gray-400 mb-1">WhatsApp number (with country code)</label>
+        <label className="block text-xs text-gray-600 mb-1">WhatsApp number (with country code)</label>
         <input
           type="tel"
           value={phone}
           onChange={e => setPhone(e.target.value)}
           placeholder="+60123456789"
-          className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-rose-500/50"
+          className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-rose-400"
           required
         />
-        <p className="text-xs text-gray-600 mt-1">
+        <p className="text-xs text-gray-400 mt-1">
           HAVEN will only message this number for check-ins. We never read your other messages.
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Frequency</label>
+          <label className="block text-xs text-gray-600 mb-1">Frequency</label>
           <select
             value={frequency}
             onChange={e => setFrequency(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none"
           >
             {FREQUENCIES.map(f => (
-              <option key={f.value} value={f.value} className="bg-gray-900">{f.label}</option>
+              <option key={f.value} value={f.value}>{f.label}</option>
             ))}
           </select>
         </div>
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Preferred time</label>
+          <label className="block text-xs text-gray-600 mb-1">Preferred time</label>
           <input
             type="time"
             value={checkinTime}
             onChange={e => setCheckinTime(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none"
+            className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none"
           />
         </div>
       </div>

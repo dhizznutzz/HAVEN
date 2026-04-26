@@ -3,44 +3,15 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
-import { Plus, X, Users, MapPin, Calendar, Zap, Lock, Search } from 'lucide-react';
-import { Circle, Opportunity } from '@/types';
+import { useRouter } from 'next/navigation';
+import { Plus, X, Users, MapPin, Calendar, Zap, Search, MessageCircle, ExternalLink } from 'lucide-react';
+import { Opportunity } from '@/types';
+import { ALL_CIRCLES, CATEGORIES, EnrichedCircle, CircleCategory } from '@/data/circles-data';
 import { createClient } from '@/lib/supabase/client';
 import { formatDistanceToNow } from 'date-fns';
 import toast from 'react-hot-toast';
 
-// ─── Demo data ────────────────────────────────────────────────────────────────
-
-const DEMO_CIRCLES: Circle[] = [
-  {
-    id: '1', name: 'Python Study Group — KL',
-    description: 'Weekly online sessions covering Python from basics to data science.',
-    interest_tags: ['python', 'programming', 'data-science'],
-    member_count: 17, max_members: 20, is_private: false,
-    created_by: 'u1', created_at: new Date().toISOString(),
-  },
-  {
-    id: '2', name: 'UI/UX Designers Bangi',
-    description: 'Design critique, portfolio reviews, and Figma tips for Malaysian designers.',
-    interest_tags: ['design', 'figma', 'ux'],
-    member_count: 14, max_members: 20, is_private: false,
-    created_by: 'u2', created_at: new Date().toISOString(),
-  },
-  {
-    id: '3', name: 'SPM Warriors 2025',
-    description: 'Study together, share tips, and motivate each other through SPM prep.',
-    interest_tags: ['spm', 'study', 'academics'],
-    member_count: 20, max_members: 20, is_private: false,
-    created_by: 'u3', created_at: new Date().toISOString(),
-  },
-  {
-    id: '4', name: 'Startup Founders Malaysia',
-    description: 'For youth building their first startups. Pitch practice and connections.',
-    interest_tags: ['entrepreneurship', 'startup', 'business'],
-    member_count: 11, max_members: 15, is_private: false,
-    created_by: 'u4', created_at: new Date().toISOString(),
-  },
-];
+// ─── Demo opportunities ────────────────────────────────────────────────────────
 
 const DEMO_OPPORTUNITIES: Opportunity[] = [
   {
@@ -85,33 +56,48 @@ const DEMO_OPPORTUNITIES: Opportunity[] = [
   },
 ];
 
-// ─── Type config ──────────────────────────────────────────────────────────────
-
-const TYPE_STYLES: Record<string, { pill: string; dot: string }> = {
-  volunteer:   { pill: 'bg-teal-50 text-teal-700 border border-teal-100',   dot: 'bg-teal-400' },
-  internship:  { pill: 'bg-blue-50 text-blue-700 border border-blue-100',   dot: 'bg-blue-400' },
-  program:     { pill: 'bg-emerald-50 text-emerald-700 border border-emerald-100', dot: 'bg-emerald-400' },
-  event:       { pill: 'bg-amber-50 text-amber-700 border border-amber-100', dot: 'bg-amber-400' },
+const TYPE_STYLES: Record<string, { pill: string }> = {
+  volunteer:  { pill: 'bg-teal-50 text-teal-700 border border-teal-100' },
+  internship: { pill: 'bg-blue-50 text-blue-700 border border-blue-100' },
+  program:    { pill: 'bg-emerald-50 text-emerald-700 border border-emerald-100' },
+  event:      { pill: 'bg-amber-50 text-amber-700 border border-amber-100' },
 };
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ConnectPage() {
+  const router = useRouter();
+  const supabase = createClient();
+
+  // Top-level tabs
   const [tab, setTab] = useState<'circles' | 'opportunities'>('circles');
-  const [circles, setCircles] = useState<Circle[]>(DEMO_CIRCLES);
-  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-  const [jobsLoading, setJobsLoading] = useState(false);
-  const [search, setSearch] = useState('');
-  const [jobQuery, setJobQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
+
+  // Circles state
+  const [circles, setCircles] = useState<EnrichedCircle[]>(ALL_CIRCLES);
+  const [circlesSubTab, setCirclesSubTab] = useState<'discover' | 'my'>('discover');
+  const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
+  const [circleSearch, setCircleSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState<CircleCategory | 'All'>('All');
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newTags, setNewTags] = useState('');
-  const supabase = createClient();
+
+  // Opportunities state
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [jobsLoading, setJobsLoading] = useState(false);
+  const [oppSearch, setOppSearch] = useState('');
+  const [jobQuery, setJobQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   useEffect(() => {
-    fetch('/api/circles').then(r => r.json()).then(d => { if (d.length) setCircles(d); }).catch(() => {});
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase.from('circle_members').select('circle_id').eq('user_id', user.id)
+        .then(({ data }) => {
+          if (data) setJoinedIds(new Set(data.map((r: { circle_id: string }) => r.circle_id)));
+        });
+    });
     loadJobs('');
   }, []);
 
@@ -133,42 +119,55 @@ export default function ConnectPage() {
     loadJobs(jobQuery);
   }
 
-  // ── Filtering ────────────────────────────────────────────────────────────────
-
-  const filteredCircles = circles.filter(c =>
-    !search || c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.interest_tags.some(t => t.includes(search.toLowerCase()))
-  );
-
-  const filteredOpportunities = opportunities.filter(o => {
-    const matchesType = typeFilter === 'all' || o.type === typeFilter;
-    const matchesSearch = !search || o.title.toLowerCase().includes(search.toLowerCase()) ||
-      o.location?.toLowerCase().includes(search.toLowerCase());
-    return matchesType && matchesSearch;
-  });
-
-  // ── Create circle ────────────────────────────────────────────────────────────
+  const handleJoin = async (circle: EnrichedCircle) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setJoinedIds(prev => new Set([...prev, circle.id]));
+      setCircles(prev => prev.map(c => c.id === circle.id ? { ...c, member_count: c.member_count + 1 } : c));
+      toast.success(`Joined ${circle.name}!`);
+      return;
+    }
+    const res = await fetch('/api/circles/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ circle_id: circle.id }),
+    });
+    if (res.ok) {
+      setJoinedIds(prev => new Set([...prev, circle.id]));
+      setCircles(prev => prev.map(c => c.id === circle.id ? { ...c, member_count: c.member_count + 1 } : c));
+      toast.success(`Joined ${circle.name}!`);
+    } else {
+      const err = await res.json();
+      toast.error(err.error || 'Failed to join');
+    }
+  };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { toast.error('Sign in to create a circle'); return; }
-
-    const tags = newTags.split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
-    const res = await fetch('/api/circles', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newName, description: newDesc, interest_tags: tags }),
-    });
-
-    if (res.ok) {
-      const circle = await res.json();
-      setCircles(prev => [circle, ...prev]);
-      setShowCreate(false);
-      setNewName(''); setNewDesc(''); setNewTags('');
-      toast.success('Circle created!');
-    }
+    setShowCreate(false);
+    setNewName(''); setNewDesc(''); setNewTags('');
+    toast.success('Circle created!');
   };
+
+  // Filtered circles for discover
+  const filteredCircles = circles.filter(c => {
+    const matchSearch = !circleSearch ||
+      c.name.toLowerCase().includes(circleSearch.toLowerCase()) ||
+      c.description.toLowerCase().includes(circleSearch.toLowerCase()) ||
+      c.interest_tags.some(t => t.includes(circleSearch.toLowerCase()));
+    const matchCat = activeCategory === 'All' || c.category === activeCategory;
+    return matchSearch && matchCat;
+  });
+
+  const joinedCircles = circles.filter(c => joinedIds.has(c.id));
+
+  // Filtered opportunities
+  const filteredOpportunities = (opportunities.length ? opportunities : DEMO_OPPORTUNITIES).filter(o => {
+    const matchesType = typeFilter === 'all' || o.type === typeFilter;
+    const matchesSearch = !oppSearch || o.title.toLowerCase().includes(oppSearch.toLowerCase()) ||
+      o.location?.toLowerCase().includes(oppSearch.toLowerCase());
+    return matchesType && matchesSearch;
+  });
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-6 pb-24">
@@ -179,56 +178,272 @@ export default function ConnectPage() {
         <p className="text-sm text-gray-500 mt-0.5">Find your people and your next opportunity</p>
       </div>
 
-      {/* Tab switcher */}
+      {/* Top tab switcher */}
       <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-4">
         {(['circles', 'opportunities'] as const).map(t => (
           <button
             key={t}
-            onClick={() => { setTab(t); setSearch(''); setTypeFilter('all'); }}
+            onClick={() => { setTab(t); }}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
               tab === t ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            {t === 'circles' ? `Circles` : 'Opportunities'}
+            {t === 'circles' ? 'Circles' : 'Opportunities'}
           </button>
         ))}
       </div>
 
-      {/* Search bar */}
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder={tab === 'circles' ? 'Search circles or tags…' : 'Search opportunities or locations…'}
-          className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-transparent"
-        />
-      </div>
-
-      {/* ── CIRCLES ─────────────────────────────────────────────────────────── */}
+      {/* ── CIRCLES ─────────────────────────────────────────────────────────────── */}
       {tab === 'circles' && (
-        <>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs text-gray-400">{filteredCircles.length} circles</p>
-            <button
-              onClick={() => setShowCreate(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-medium transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              New Circle
-            </button>
+        <div>
+          {/* Sub-tabs: Discover / My Circles */}
+          <div className="flex gap-0 border-b border-gray-100 mb-4">
+            {(['discover', 'my'] as const).map(st => (
+              <button
+                key={st}
+                onClick={() => setCirclesSubTab(st)}
+                className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-all -mb-px ${
+                  circlesSubTab === st
+                    ? 'border-amber-500 text-gray-900'
+                    : 'border-transparent text-gray-400 hover:text-gray-700'
+                }`}
+              >
+                {st === 'discover' ? 'Discover' : (
+                  <span className="flex items-center gap-1.5">
+                    My Circles
+                    {joinedIds.size > 0 && (
+                      <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold leading-none">
+                        {joinedIds.size}
+                      </span>
+                    )}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
 
-          <div className="space-y-3">
-            {filteredCircles.map(c => <CircleRow key={c.id} circle={c} />)}
-            {filteredCircles.length === 0 && <EmptyState text="No circles match your search" />}
-          </div>
-        </>
+          {circlesSubTab === 'my' ? (
+            /* ── MY CIRCLES DASHBOARD ── */
+            joinedCircles.length === 0 ? (
+              <div className="text-center py-14">
+                <div className="text-4xl mb-3">⭕</div>
+                <p className="text-sm text-gray-500">You haven&apos;t joined any circles yet</p>
+                <button onClick={() => setCirclesSubTab('discover')} className="mt-2 text-sm text-amber-600 hover:underline">
+                  Browse circles →
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs text-gray-400 mb-1">{joinedCircles.length} circle{joinedCircles.length !== 1 ? 's' : ''} joined</p>
+                {joinedCircles.map(circle => (
+                  <div key={circle.id} className="rounded-xl border border-gray-100 bg-white p-4 hover:border-amber-200 transition-colors">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <div className="text-2xl leading-none mt-0.5">{circle.emoji}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-sm font-semibold text-gray-900">{circle.name}</h3>
+                            {circle.is_real && (
+                              <span className="text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Real org</span>
+                            )}
+                            <span className="text-[10px] px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium">
+                              {circle.category}
+                            </span>
+                          </div>
+                          {circle.location && <p className="text-xs text-gray-400 mt-0.5">📍 {circle.location}</p>}
+                          {circle.last_message && (
+                            <p className="text-xs text-gray-500 mt-1.5 truncate">
+                              <span className="text-gray-400">{circle.last_message_time} · </span>
+                              {circle.last_message}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2 shrink-0">
+                        {(circle.unread ?? 0) > 0 && (
+                          <span className="px-1.5 py-0.5 bg-amber-500 text-white rounded-full text-[10px] font-bold leading-none">
+                            {circle.unread}
+                          </span>
+                        )}
+                        <button
+                          onClick={() => router.push(`/circle/${circle.id}`)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-white rounded-lg text-xs font-medium hover:bg-amber-600 transition-colors"
+                        >
+                          <MessageCircle className="w-3 h-3" />
+                          Open Chat
+                        </button>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-3 text-xs text-gray-400">
+                      <span className="flex items-center gap-1"><Users className="w-3 h-3" />{circle.member_count} members</span>
+                      <span className="text-green-500 font-medium">● Active</span>
+                      {circle.website && (
+                        <a
+                          href={`https://${circle.website}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-0.5 text-amber-600 hover:underline ml-auto"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          {circle.website}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : (
+            /* ── DISCOVER ── */
+            <div>
+              {/* Search */}
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  value={circleSearch}
+                  onChange={e => setCircleSearch(e.target.value)}
+                  placeholder="Search circles by name or interest…"
+                  className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-transparent"
+                />
+              </div>
+
+              {/* Category filter pills */}
+              <div className="flex gap-2 overflow-x-auto pb-2 mb-3 scrollbar-hide">
+                {(['All', ...CATEGORIES] as const).map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat as CircleCategory | 'All')}
+                    className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
+                      activeCategory === cat
+                        ? 'bg-amber-500 text-white border-amber-500'
+                        : 'bg-white text-gray-500 border-gray-200 hover:border-amber-300 hover:text-amber-700'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              {/* Count + New Circle */}
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-gray-400">{filteredCircles.length} circles</p>
+                <button
+                  onClick={() => setShowCreate(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-medium transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  New Circle
+                </button>
+              </div>
+
+              {/* Circle cards */}
+              <div className="space-y-3">
+                {filteredCircles.map(circle => {
+                  const isJoined = joinedIds.has(circle.id);
+                  const fillPct = Math.round((circle.member_count / circle.max_members) * 100);
+                  const isFull = circle.member_count >= circle.max_members;
+                  return (
+                    <div key={circle.id} className="rounded-xl border border-gray-100 bg-white p-4 hover:border-amber-200 transition-colors">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-3 flex-1 min-w-0">
+                          <span className="text-xl leading-none mt-0.5 shrink-0">{circle.emoji}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <h3 className="text-sm font-semibold text-gray-900">{circle.name}</h3>
+                              {circle.is_real && (
+                                <span className="text-[10px] px-1.5 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">Real org</span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap gap-1 mb-1.5">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-500 font-medium">
+                                {circle.category}
+                              </span>
+                              {circle.interest_tags.slice(0, 2).map(tag => (
+                                <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 font-medium">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                            <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{circle.description}</p>
+                            {circle.location && <p className="text-xs text-gray-400 mt-1">📍 {circle.location}</p>}
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2 shrink-0">
+                          <button
+                            onClick={() => !isJoined && !isFull && handleJoin(circle)}
+                            disabled={isJoined || isFull}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                              isJoined
+                                ? 'bg-green-100 text-green-700 cursor-default'
+                                : isFull
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'border border-amber-200 bg-white text-amber-700 hover:bg-amber-50'
+                            }`}
+                          >
+                            {isJoined ? '✓ Joined' : isFull ? 'Full' : 'Join'}
+                          </button>
+                          {isJoined && (
+                            <button
+                              onClick={() => router.push(`/circle/${circle.id}`)}
+                              className="flex items-center gap-1 text-xs text-amber-600 hover:underline"
+                            >
+                              <MessageCircle className="w-3 h-3" />
+                              Chat
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <div className="flex items-center justify-between text-xs text-gray-400 mb-1.5">
+                          <span className="flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {circle.member_count}/{circle.max_members} members
+                          </span>
+                          <span className={fillPct >= 85 ? 'text-amber-600' : ''}>
+                            {fillPct >= 85 ? 'Almost full' : `${100 - fillPct}% space left`}
+                          </span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${fillPct >= 85 ? 'bg-amber-400' : 'bg-amber-300'}`}
+                            style={{ width: `${fillPct}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                {filteredCircles.length === 0 && (
+                  <div className="py-12 text-center text-gray-400">
+                    <p className="text-sm">No circles match your search</p>
+                    <button
+                      onClick={() => { setCircleSearch(''); setActiveCategory('All'); }}
+                      className="mt-2 text-sm text-amber-600 hover:underline"
+                    >
+                      Clear filters
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
-      {/* ── OPPORTUNITIES ────────────────────────────────────────────────────── */}
+      {/* ── OPPORTUNITIES ───────────────────────────────────────────────────────── */}
       {tab === 'opportunities' && (
         <>
+          {/* Search */}
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              value={oppSearch}
+              onChange={e => setOppSearch(e.target.value)}
+              placeholder="Search opportunities or locations…"
+              className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 focus:border-transparent"
+            />
+          </div>
+
           {/* Job keyword search */}
           <form onSubmit={handleJobSearch} className="flex gap-2 mb-3">
             <input
@@ -264,16 +479,18 @@ export default function ConnectPage() {
 
           {jobsLoading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-36 rounded-xl bg-gray-100 animate-pulse" />
-              ))}
+              {[1, 2, 3].map(i => <div key={i} className="h-36 rounded-xl bg-gray-100 animate-pulse" />)}
             </div>
           ) : (
             <>
               <p className="text-xs text-gray-400 mb-3">{filteredOpportunities.length} opportunities found in Malaysia</p>
               <div className="space-y-3">
                 {filteredOpportunities.map(o => <OpportunityRow key={o.id} opportunity={o} />)}
-                {filteredOpportunities.length === 0 && <EmptyState text="No opportunities match your filter" />}
+                {filteredOpportunities.length === 0 && (
+                  <div className="py-12 text-center text-gray-400">
+                    <p className="text-sm">No opportunities match your filter</p>
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -312,7 +529,8 @@ export default function ConnectPage() {
               />
               <button
                 type="submit"
-                className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-sm font-medium transition-colors"
+                disabled={!newName.trim()}
+                className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-40 text-white rounded-xl text-sm font-medium transition-colors"
               >
                 Create Circle
               </button>
@@ -324,105 +542,7 @@ export default function ConnectPage() {
   );
 }
 
-// ─── Circle row card ──────────────────────────────────────────────────────────
-
-function CircleRow({ circle }: { circle: Circle }) {
-  const [joined, setJoined] = useState(false);
-  const [memberCount, setMemberCount] = useState(circle.member_count);
-  const supabase = createClient();
-  const full = memberCount >= circle.max_members;
-
-  // Demo circles have short numeric IDs — they don't exist in the DB
-  const isDemo = !circle.id.includes('-');
-
-  const handleJoin = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { toast.error('Sign in to join circles'); return; }
-
-    let circleId = circle.id;
-
-    // Demo circles don't exist in DB yet — create them first
-    if (isDemo) {
-      const createRes = await fetch('/api/circles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: circle.name,
-          description: circle.description,
-          interest_tags: circle.interest_tags,
-          max_members: circle.max_members,
-        }),
-      });
-      if (!createRes.ok) { toast.error('Failed to join'); return; }
-      const created = await createRes.json();
-      circleId = created.id;
-      // Creator is auto-joined, so we're done
-      setJoined(true);
-      setMemberCount(c => c + 1);
-      toast.success(`Joined ${circle.name}!`);
-      return;
-    }
-
-    const res = await fetch('/api/circles/join', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ circle_id: circleId }),
-    });
-    const json = await res.json();
-
-    if (!res.ok) {
-      toast.error(json.error === 'Already a member' ? 'Already a member' : json.error ?? 'Failed to join');
-    } else {
-      setJoined(true);
-      setMemberCount(c => c + 1);
-      toast.success(`Joined ${circle.name}!`);
-    }
-  };
-
-  return (
-    <div className="flex items-start gap-3 p-4 rounded-xl border border-gray-100 bg-white hover:border-amber-200 transition-colors">
-      {/* Avatar */}
-      <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 text-amber-700 font-semibold text-sm">
-        {circle.name[0]}
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <p className="text-sm font-medium text-gray-900 truncate">{circle.name}</p>
-          {circle.is_private && <Lock className="w-3 h-3 text-gray-400 flex-shrink-0" />}
-        </div>
-        {circle.description && (
-          <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{circle.description}</p>
-        )}
-        <div className="flex items-center gap-3 mt-1.5">
-          <span className="flex items-center gap-1 text-xs text-gray-400">
-            <Users className="w-3 h-3" />
-            {memberCount}/{circle.max_members}
-          </span>
-          {circle.interest_tags.slice(0, 2).map(tag => (
-            <span key={tag} className="text-xs px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700">
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <button
-        onClick={handleJoin}
-        disabled={joined || full}
-        className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-          joined ? 'bg-green-100 text-green-700 cursor-default'
-          : full ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-          : 'bg-amber-500 hover:bg-amber-600 text-white'
-        }`}
-      >
-        {joined ? 'Joined' : full ? 'Full' : 'Join'}
-      </button>
-    </div>
-  );
-}
-
-// ─── Opportunity row card ─────────────────────────────────────────────────────
+// ─── Opportunity card ─────────────────────────────────────────────────────────
 
 function OpportunityRow({ opportunity }: { opportunity: Opportunity & { employer_name?: string; employer_logo?: string; apply_url?: string } }) {
   const style = TYPE_STYLES[opportunity.type] ?? TYPE_STYLES.event;
@@ -437,7 +557,6 @@ function OpportunityRow({ opportunity }: { opportunity: Opportunity & { employer
 
   return (
     <div className="p-4 rounded-xl border border-gray-100 bg-white hover:border-teal-200 transition-colors">
-      {/* Header row — logo + title */}
       <div className="flex items-start gap-3">
         {(opportunity as any).employer_logo ? (
           <img
@@ -451,21 +570,15 @@ function OpportunityRow({ opportunity }: { opportunity: Opportunity & { employer
             {((opportunity as any).employer_name ?? opportunity.title)[0]}
           </div>
         )}
-
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${style.pill}`}>
-              {opportunity.type}
-            </span>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${style.pill}`}>{opportunity.type}</span>
             {(opportunity as any).source === 'linkedin' && (
-              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-600 border border-blue-100">
-                LinkedIn
-              </span>
+              <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-600 border border-blue-100">LinkedIn</span>
             )}
             {opportunity.match_score !== undefined && (
               <span className="flex items-center gap-0.5 text-xs text-teal-600 font-medium">
-                <Zap className="w-3 h-3" />
-                {opportunity.match_score}% match
+                <Zap className="w-3 h-3" />{opportunity.match_score}% match
               </span>
             )}
           </div>
@@ -506,16 +619,6 @@ function OpportunityRow({ opportunity }: { opportunity: Opportunity & { employer
       >
         {(opportunity as any).apply_url ? 'Apply on site →' : 'Apply Now'}
       </button>
-    </div>
-  );
-}
-
-// ─── Empty state ──────────────────────────────────────────────────────────────
-
-function EmptyState({ text }: { text: string }) {
-  return (
-    <div className="py-12 text-center text-gray-400">
-      <p className="text-sm">{text}</p>
     </div>
   );
 }

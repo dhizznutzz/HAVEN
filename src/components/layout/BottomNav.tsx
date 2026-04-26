@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Home, Compass, Users, Heart, Shield, UserCircle, LogOut, User, X } from 'lucide-react';
+import { Home, Compass, Users, Heart, UserCircle, LogOut, User, X } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -11,7 +11,6 @@ const NAV_ITEMS = [
   { href: '/feed',       label: 'Home',      icon: Home },
   { href: '/grow',       label: 'Grow',      icon: Compass },
   { href: '/connect',    label: 'Community', icon: Users },
-  { href: '/guardian',   label: 'Guardian',  icon: Shield },
   { href: '/safe-space', label: 'Safe Space', icon: Heart },
 ];
 
